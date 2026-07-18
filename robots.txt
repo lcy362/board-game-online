@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://speed101.games/sitemap.xml
+Sitemap: https://game.lichuanyang.top/sitemap.xml

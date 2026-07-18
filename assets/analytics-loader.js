@@ -4,11 +4,11 @@
  */
 window.SITE_CONFIG = {
   // Google Analytics 4 测量 ID（格式 G-XXXXXXXXXX）
-  gaId: 'G-XXXXXXXXXX',
+  gaId: 'G-SFKXJS8H9Q',
   // Google AdSense 发布商 ID（格式 ca-pub-XXXXXXXXXXXXXXXX）
-  adsenseId: 'ca-pub-XXXXXXXXXXXXXXXX',
+  adsenseId: 'ca-pub-7310841175510611',
   // 是否启用（占位符阶段保持 false，避免控制台报错；拿到真实 ID 后改为 true）
-  enabled: false,
+  enabled: true,
 };
 
 (function () {

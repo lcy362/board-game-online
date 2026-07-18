@@ -30,7 +30,7 @@
 
 ### 首页 `index.html`
 - [x] H1 加入「《极速101》」与「桌游」：`极速桌游馆：把《极速101》等经典桌游，变成即点即玩的网页小游戏`
-- [x] canonical / og:url / WebSite.url / Organization.url 统一为 `https://speed101.games/`
+- [x] canonical / og:url / WebSite.url / Organization.url 统一为 `https://game.lichuanyang.top/`
 - [x] 删除 WebSite 的 `SearchAction`（无站内搜索，避免误导爬虫）
 - [x] 新增 **Organization** JSON-LD
 - [x] 新增 **og:image**（1200×630 封面）
@@ -106,7 +106,7 @@
 
 唯一上线前置动作：将以下占位符替换为真实 ID（集中配置，互不污染）：
 - `assets/analytics-loader.js` 内 `gaId` / `adsenseId`，并将 `enabled` 置 `true` 才注入
-- 三页 `<meta name="google-site-verification" content="PLACEHOLDER_GSC_VERIFICATION">` 替换为 GSC 验证码
+- 三页 `<meta name="google-site-verification" content="AUXjM9SH3SycuX49Qv1r0UQfa5AwvIE-4q27LUEf5aU">` 替换为 GSC 验证码
 
 ---
 

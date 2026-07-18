@@ -1,0 +1,16 @@
+# Cloudflare Pages 部署时排除以下内容
+# 仓库根目录即为可部署站点（index.html / assets / games / robots.txt / sitemap.xml），
+# 下方目录/文件不进入生产，也不被搜索引擎收录。
+design/
+docs/
+release/
+speed101/
+reports/
+scripts/
+node_modules/
+.workbuddy/
+dist/
+*.zip
+package.json
+wrangler.toml
+极速101改造方案.md

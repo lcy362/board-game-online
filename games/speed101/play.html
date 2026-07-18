@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>极速101 在线玩 · 卡牌数学竞速（单人 vs AI）</title>
+  <meta name="description" content="极速101（Speed 101）网页版：免费在线桌游，单人 vs 1–5 名 AI 车手，用卡牌把速度累加到接近 101 却不爆胎。即点即玩、支持中文 / English。">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0a9c7c">
+  <meta name="google-site-verification" content="PLACEHOLDER_GSC_VERIFICATION">
+  <link rel="canonical" href="https://speed101.games/games/speed101/play.html">
+  <meta property="og:title" content="极速101 在线玩 · 卡牌数学竞速">
+  <meta property="og:description" content="单人 vs AI 的卡牌数学竞速，浏览器即点即玩。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://speed101.games/games/speed101/play.html">
+  <meta property="og:site_name" content="极速桌游馆">
+  <meta property="og:image" content="https://speed101.games/assets/og-cover.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary">
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(180deg, #0a9c7c 0%, #067a63 100%);
+      min-height: 100vh;
+      color: #333;
+      overflow-x: hidden;
+      touch-action: manipulation;
+    }
+    #app { width: 100%; max-width: 520px; margin: 0 auto; padding: 12px; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+    }
+    h1 {
+      text-align: center;
+      margin: 0 0 8px;
+      font-size: 1.8rem;
+      color: #fff;
+      text-shadow: 2px 2px 0 #064e3f;
+    }
+    .subtitle { text-align: center; color: #e0f7f4; font-size: 0.9rem; margin-bottom: 18px; }
+    .title-card { text-align: center; background: linear-gradient(135deg, #ffd93d 0%, #ffb800 100%); }
+    .title-card .car-icon { font-size: 3rem; margin-bottom: 8px; filter: drop-shadow(0 3px 0 rgba(0,0,0,0.12)); }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 14px 22px;
+      border: none; border-radius: 14px;
+      font-size: 1.05rem; font-weight: 700; color: #fff;
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+      box-shadow: 0 6px 0 #c93a18, 0 8px 16px rgba(0,0,0,0.16);
+      cursor: pointer; transition: transform .05s, box-shadow .05s;
+      width: 100%; margin: 8px 0;
+    }
+    .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #c93a18, 0 4px 8px rgba(0,0,0,0.16); }
+    .btn.secondary { background: linear-gradient(135deg, #4ecdc4 0%, #2cb5ac 100%); box-shadow: 0 6px 0 #1d8a82, 0 8px 16px rgba(0,0,0,0.16); }
+    .btn.secondary:active { box-shadow: 0 2px 0 #1d8a82, 0 4px 8px rgba(0,0,0,0.16); }
+    .btn.small { width: auto; padding: 10px 18px; font-size: 0.95rem; margin: 0; }
+    .config-row { display: flex; align-items: center; justify-content: space-between; margin: 12px 0; }
+    .config-row label { font-weight: 600; color: #fff; }
+    .config-row select {
+      padding: 10px 14px; border-radius: 10px; border: none;
+      font-size: 1rem; font-weight: 700; color: #333; min-width: 130px;
+    }
+    .speedometer {
+      width: 200px; height: 200px; margin: 10px auto 16px;
+      border-radius: 50%; background: #fff;
+      position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.08), 0 6px 20px rgba(0,0,0,0.18);
+      border: 8px solid #e0f2f1;
+    }
+    .speedometer::before {
+      content: ""; position: absolute; inset: 0; border-radius: 50%;
+      background: conic-gradient(from 180deg, #4ecdc4 0deg 90deg, #ffd93d 90deg 160deg, #ff6b6b 160deg 200deg, transparent 200deg 360deg);
+      mask: radial-gradient(transparent 62%, black 63%); -webkit-mask: radial-gradient(transparent 62%, black 63%);
+    }
+    .speedometer.danger { border-color: #ff6b6b; animation: pulse 0.8s infinite; }
+    .speed-needle {
+      position: absolute; width: 4px; height: 78px; background: #333; left: 50%; top: 50%;
+      transform-origin: bottom center; transform: translate(-50%, -100%) rotate(-120deg);
+      border-radius: 2px; transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1); z-index: 2;
+    }
+    .speed-needle::after { content: ""; position: absolute; width: 14px; height: 14px; background: #333; border-radius: 50%; left: 50%; top: 100%; transform: translate(-50%, -50%); }
+    .speed-value {
+      position: absolute; left: 50%; top: 60%; transform: translate(-50%, -50%);
+      font-size: 3.2rem; font-weight: 900; color: #333; line-height: 1;
+    }
+    .speed-label {
+      position: absolute; left: 50%; top: 76%; transform: translateX(-50%);
+      font-size: 0.75rem; font-weight: 700; color: #888; letter-spacing: 1px;
+    }
+    .racers { display: flex; justify-content: space-between; margin: 8px 0 14px; }
+    .racer {
+      flex: 1; text-align: center; padding: 10px 6px; margin: 0 4px;
+      background: #fff; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .racer.active { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); border: 2px solid #ffd93d; }
+    .racer.ai { background: #f0f9f8; }
+    .racer .car { font-size: 2.2rem; filter: drop-shadow(0 2px 0 rgba(0,0,0,0.1)); }
+    .racer .name { font-weight: 700; font-size: 0.85rem; margin: 4px 0; }
+    .tires { display: flex; justify-content: center; gap: 3px; }
+    .tire { font-size: 1rem; }
+    .tire.lost { filter: grayscale(100%) opacity(0.25); }
+    .hand { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 12px 0; min-height: 96px; }
+    .hand-card {
+      width: 72px; height: 96px; border-radius: 10px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 1.2rem; cursor: pointer;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.12), 0 6px 12px rgba(0,0,0,0.12);
+      transition: transform 0.1s, box-shadow 0.1s; user-select: none; position: relative;
+    }
+    .hand-card.disabled { opacity: 0.45; pointer-events: none; filter: grayscale(0.6); }
+    .hand-card:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.12); }
+    .hand-card.speed { background: linear-gradient(135deg, #fff 0%, #f5f5f5 100%); color: #333; border: 2px solid #e0e0e0; }
+    .hand-card.speed.pos { border-color: #ff6b6b; color: #d63031; }
+    .hand-card.speed.neg { border-color: #4ecdc4; color: #0a9c7c; }
+    .hand-card.func { background: linear-gradient(135deg, #ffd93d 0%, #ffb800 100%); color: #5a3d00; border: 2px solid #e5a800; font-size: 0.9rem; }
+    .hand-card.func-brake { background: linear-gradient(135deg, #4ecdc4 0%, #2cb5ac 100%); color: #fff; border-color: #1d8a82; }
+    .hand-card.func-fuel { background: linear-gradient(135deg, #ff9f43 0%, #ee8820 100%); color: #fff; border-color: #cc6a10; }
+    .hand-card.func-skip { background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%); color: #fff; border-color: #5541d7; }
+    .hand-card.func-reverse { background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%); color: #fff; border-color: #c42a6e; }
+    .hand-card.func-double { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); color: #fff; border-color: #c93a18; }
+    .hand-card.func-extra { background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%); color: #5a3d00; border-color: #d4a836; }
+    .hand-card.func-flip { background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%); color: #fff; border-color: #0769b6; }
+    .hand-card .type { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; opacity: 0.7; margin-bottom: 2px; }
+    .hand-card .name { font-size: 0.7rem; font-weight: 700; text-align: center; line-height: 1.1; max-width: 90%; }
+    .log {
+      background: rgba(255,255,255,0.95); border-radius: 14px; padding: 12px; min-height: 72px; max-height: 140px; overflow-y: auto;
+      font-size: 0.85rem; line-height: 1.55; margin: 12px 0;
+    }
+    .log .entry { margin: 3px 0; padding: 2px 0; }
+    .log .entry.player { color: #2d3436; }
+    .log .entry.ai { color: #636e72; }
+    .log .entry.event { color: #d63031; font-weight: 700; }
+    .log .entry.system { color: #098e75; font-weight: 600; }
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); display: none; align-items: center; justify-content: center; z-index: 50; }
+    .overlay.active { display: flex; }
+    .modal { background: #fff; border-radius: 20px; padding: 24px; text-align: center; max-width: 340px; width: 90%; box-shadow: 0 16px 40px rgba(0,0,0,0.3); }
+    .modal h2 { margin: 0 0 10px; font-size: 1.5rem; }
+    .modal p { color: #666; font-size: 0.95rem; margin: 8px 0; }
+    .modal .big-icon { font-size: 4rem; margin-bottom: 10px; }
+    .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+    @keyframes shake { 10%, 90% { transform: translate3d(-1px,0,0); } 20%, 80% { transform: translate3d(2px,0,0); } 30%, 50%, 70% { transform: translate3d(-4px,0,0); } 40%, 60% { transform: translate3d(4px,0,0); } }
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,107,107,0.4); } 70% { box-shadow: 0 0 0 12px rgba(255,107,107,0); } 100% { box-shadow: 0 0 0 0 rgba(255,107,107,0); } }
+    .badge { display: inline-block; background: #ffd93d; color: #5a3d00; font-weight: 700; font-size: 0.7rem; padding: 2px 6px; border-radius: 6px; margin-left: 4px; }
+    .rules { font-size: 0.85rem; color: #fff; line-height: 1.6; background: rgba(255,255,255,0.12); padding: 12px; border-radius: 12px; margin-top: 12px; }
+    .rules strong { color: #ffd93d; }
+  @media (max-width: 360px) {
+    .speedometer { width: 170px; height: 170px; }
+    .speed-value { font-size: 2.6rem; }
+    .hand-card { width: 72px; height: 96px; }
+    .racer .car { font-size: 1.8rem; }
+  }
+
+  /* ===== 规则展示与新手引导（新增） ===== */
+  .top-actions { display: flex; gap: 8px; margin-top: 8px; }
+  .top-actions .btn { margin: 0; flex: 1; }
+
+  /* 语言切换控件 */
+  .lang-toggle { text-align: center; color: #fff; font-weight: 700; font-size: 0.95rem; margin: 4px 0 12px; }
+  .lang-toggle a { color: #fff; text-decoration: none; opacity: 0.55; margin: 0 6px; padding: 2px 6px; border-radius: 6px; cursor: pointer; }
+  .lang-toggle a.active { opacity: 1; text-decoration: underline; font-weight: 800; }
+  .lang-toggle .sep { opacity: 0.5; margin: 0 2px; }
+  #btn-lang { flex: 0 0 auto; }
+
+  /* 弹层通用 */
+  .modal-x {
+    position: absolute; top: 10px; right: 12px;
+    width: 36px; height: 36px; min-width: 36px; min-height: 36px;
+    border: none; background: transparent; font-size: 1.2rem; color: #888; cursor: pointer;
+    border-radius: 50%;
+  }
+  .modal-x:active { background: rgba(0,0,0,0.08); }
+
+  /* 完整规则弹层 */
+  .rules-modal, .card-modal { z-index: 95; }
+  .rules-modal .modal { max-width: 430px; text-align: left; max-height: 86vh; overflow-y: auto; position: relative; }
+  .rules-modal h2 { text-align: center; }
+  .rules-section { margin: 6px 0; }
+  .rules-section h3 { margin: 14px 0 6px; font-size: 1.02rem; color: #0a9c7c; border-left: 4px solid #ffd93d; padding-left: 8px; }
+  .rules-section p { margin: 4px 0; font-size: 0.9rem; line-height: 1.55; color: #444; }
+  .rules-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin: 4px 0; }
+  .rules-table th, .rules-table td { border: 1px solid #eee; padding: 6px 8px; text-align: left; vertical-align: top; }
+  .rules-table th { background: #f0f9f8; color: #0a9c7c; }
+  .rules-table .rk-icon { font-size: 1.1rem; white-space: nowrap; width: 1%; }
+  .rules-tip { background: #fff8e1; border: 1px solid #ffe082; border-radius: 10px; padding: 8px 10px; font-size: 0.84rem; line-height: 1.6; color: #5a3d00; }
+  .rules-close-row { display: flex; gap: 8px; margin-top: 14px; }
+
+  /* 单卡迷你规则 */
+  .card-modal .modal { max-width: 320px; }
+  .card-modal .big-icon { font-size: 3.4rem; margin-bottom: 4px; }
+  .card-modal .card-name { font-weight: 800; font-size: 1.25rem; margin: 2px 0; color: #333; }
+  .card-modal .card-effect { color: #0a9c7c; font-weight: 700; font-size: 1rem; margin: 4px 0; }
+  .card-modal .card-when { color: #636e72; font-size: 0.85rem; margin: 6px 0; }
+  .card-modal .card-example { background: #f0f9f8; border-radius: 10px; padding: 8px 10px; font-size: 0.85rem; margin-top: 6px; color: #333; }
+
+  /* 确认弹窗（必爆牌） */
+  .confirm-modal { z-index: 96; }
+  .confirm-modal .modal { max-width: 320px; }
+
+  /* 手牌底部状态行（三态） */
+  .card-status { font-size: 0.6rem; font-weight: 800; line-height: 1.05; margin-top: 3px; letter-spacing: 0.2px; }
+  .card-status.safe { color: #0a9c7c; }
+  .card-status.danger { color: #e8431f; animation: pulseText 0.9s infinite; }
+  .card-status.burst { color: #c0392b; }
+  .card-status.strategy { color: #0984e3; }
+  @keyframes pulseText { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+  .hand-card.show-danger { border: 2px solid #e8431f !important; }
+  .hand-card.will-burst { border: 2px dashed #c0392b !important; filter: grayscale(0.4); }
+  /* 功能牌右上角 ? 按钮 */
+  .card-q {
+    position: absolute; top: 3px; right: 3px;
+    width: 34px; height: 34px; min-width: 34px; min-height: 34px;
+    border: none; border-radius: 50%;
+    background: rgba(0,0,0,0.4); color: #fff; font-weight: 900; font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; padding: 0; z-index: 3;
+  }
+  .card-q:active { transform: scale(0.9); background: rgba(0,0,0,0.6); }
+
+  /* 新手引导覆盖层 */
+  .tutorial-overlay { position: fixed; inset: 0; z-index: 90; display: none; background: transparent; pointer-events: none; }
+  .tutorial-overlay.active { display: block; }
+  .tutorial-overlay.active.dim { background: rgba(0,0,0,0.72); pointer-events: auto; }
+  .tutorial-spot {
+    position: absolute; border: 3px solid #ffd93d; border-radius: 14px;
+    box-shadow: 0 0 0 4px rgba(255,217,61,0.35), 0 0 22px rgba(255,217,61,0.7);
+    pointer-events: none; transition: all 0.25s ease; display: none;
+  }
+  .tutorial-tip {
+    position: absolute; max-width: 300px; background: #fff; border-radius: 16px;
+    padding: 16px; box-shadow: 0 12px 36px rgba(0,0,0,0.35); pointer-events: auto; display: none;
+  }
+  .tutorial-tip .tut-text { font-size: 0.92rem; line-height: 1.55; color: #333; margin-bottom: 12px; }
+  .tutorial-tip .tut-text b { color: #0a9c7c; }
+  .tutorial-tip .tut-btns { display: flex; gap: 8px; justify-content: flex-end; }
+  .tutorial-tip .tut-btns .btn { width: auto; margin: 0; padding: 10px 16px; font-size: 0.9rem; min-height: 44px; }
+
+  /* 可访问性：减少动效但保留状态文字 */
+  @media (prefers-reduced-motion: reduce) {
+    .card-status.danger, .speedometer.danger, .shake, .tutorial-spot { animation: none !important; transition: none !important; }
+  }
+  .play-nav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;gap:14px;justify-content:center;padding:8px 12px;background:rgba(6,122,99,.96);box-shadow:0 2px 10px rgba(0,0,0,.2);}
+  .play-nav a{color:#fff;font-weight:700;font-size:.85rem;text-decoration:none;}
+  .play-nav a:first-child{border-right:1px solid rgba(255,255,255,.4);padding-right:14px;}
+</style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoGame",
+    "name": "极速101 网页版",
+    "alternateName": ["Speed 101", "极速101 在线玩"],
+    "description": "卡通赛车主题的卡牌数学竞速，单人 vs 1–5 名 AI，浏览器即点即玩。",
+    "genre": ["Card Game", "Racing", "Educational", "Math"],
+    "gamePlatform": "Web browser",
+    "applicationCategory": "Game",
+    "operatingSystem": "Any",
+    "inLanguage": ["zh-CN", "en"],
+    "url": "https://speed101.games/games/speed101/play.html",
+    "isPartOf": { "@type": "WebApplication", "name": "极速桌游馆", "url": "https://speed101.games/" },
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "首页", "item": "https://speed101.games/" },
+      { "@type": "ListItem", "position": 2, "name": "极速101", "item": "https://speed101.games/games/speed101/" },
+      { "@type": "ListItem", "position": 3, "name": "在线玩", "item": "https://speed101.games/games/speed101/play.html" }
+    ]
+  }
+  </script>
+</head>
+<body>
+<nav id="play-nav" class="play-nav" style="display:none;">
+  <a href="index.html">← 极速101 规则百科与 FAQ</a>
+  <a href="../../index.html">极速桌游馆 · 免费在线桌游</a>
+</nav>
+<div id="app">
+  <!-- 开始屏 -->
+  <div id="screen-start" class="screen active">
+    <h1 data-i18n="title">极速101</h1>
+    <div class="subtitle" data-i18n="subtitle">数学竞速 · 别爆胎</div>
+    <div class="card title-card">
+      <div class="car-icon">🏎️</div>
+      <div style="font-weight:800;font-size:1.2rem;color:#5a3d00;margin-bottom:4px" data-i18n="title_card_label">卡通赛车版</div>
+      <div style="font-size:0.85rem;color:#5a3d00" data-i18n="title_card_sub">100以内加减 · 策略博弈</div>
+    </div>
+    <div class="card" style="background:rgba(255,255,255,0.12);color:#fff">
+      <div class="config-row">
+        <label data-i18n="cfg_ai_count">AI 数量</label>
+        <select id="cfg-ai-count">
+          <option value="1" data-i18n="opt_ai_1">1 个</option>
+          <option value="2" data-i18n="opt_ai_2">2 个</option>
+          <option value="3" selected data-i18n="opt_ai_3">3 个</option>
+          <option value="4" data-i18n="opt_ai_4">4 个</option>
+          <option value="5" data-i18n="opt_ai_5">5 个</option>
+        </select>
+      </div>
+      <div class="config-row">
+        <label data-i18n="cfg_ai_diff">AI 难度</label>
+        <select id="cfg-ai-level">
+          <option value="easy" data-i18n="opt_easy">简单</option>
+          <option value="medium" selected data-i18n="opt_medium">中等</option>
+          <option value="hard" data-i18n="opt_hard">困难</option>
+        </select>
+      </div>
+    </div>
+    <div class="lang-toggle">
+      🌐 <a href="javascript:void(0)" data-lang="zh">中文</a><span class="sep">/</span><a href="javascript:void(0)" data-lang="en">EN</a>
+    </div>
+    <button class="btn" id="btn-start" data-i18n="btn_start">发车！</button>
+    <button class="btn secondary" id="btn-rules" type="button" data-i18n="btn_rules">📖 玩法说明</button>
+    <button class="btn secondary" id="btn-tutorial" type="button" data-i18n="btn_tutorial">🎓 玩法教学</button>
+    <div class="rules" data-i18n-html="start_rules">
+      <strong>规则：</strong>轮流出牌累加速度，超过 101 爆胎扣 1 轮胎，用完即淘汰。速度牌+1~+12；功能牌：刹车-10、急刹-20、加油+18、调速50、超车（跳过下家）、掉头（反转方向/2人局再来一轮）、连续油门（指定下家连出2张）、升档加速（额外出1张速度牌）、失控反转（101-当前速度）。
+    </div>
+  </div>
+
+  <!-- 游戏屏 -->
+  <div id="screen-game" class="screen">
+    <div class="card" style="padding:12px 14px">
+      <div class="racers" id="racers"></div>
+      <div class="speedometer" id="speedometer">
+        <div class="speed-needle" id="needle"></div>
+        <div class="speed-value" id="speed-value">0</div>
+        <div class="speed-label">SPEED</div>
+      </div>
+      <div class="log" id="log"></div>
+      <div id="player-area">
+        <div style="font-weight:700;color:#fff;text-align:center;margin-bottom:6px" data-i18n="your_hand">你的手牌</div>
+        <div class="hand" id="hand"></div>
+      </div>
+      <div class="top-actions">
+        <button class="btn secondary small" id="btn-back" type="button" data-i18n="btn_back">返回主菜单</button>
+        <button class="btn secondary small" id="btn-help" type="button" data-i18n="btn_help">❓ 玩法</button>
+        <button class="btn secondary small" id="btn-lang" type="button">🌐 中文 / EN</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 弹窗 -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="big-icon" id="modal-icon">🏁</div>
+    <h2 id="modal-title" data-i18n="end_title_default">游戏结束</h2>
+    <p id="modal-msg">...</p>
+    <button class="btn" id="btn-modal" data-i18n="btn_play_again">再来一局</button>
+  </div>
+</div>
+
+<!-- 完整规则弹层 -->
+<div class="overlay rules-modal" id="rules-modal">
+  <div class="modal">
+    <button class="modal-x" id="rules-x" type="button" aria-label="关闭">✕</button>
+    <h2 data-i18n="rules_modal_title">📖 玩法说明</h2>
+    <div id="rules-body"></div>
+    <div class="rules-close-row">
+      <button class="btn" id="rules-ok" type="button" data-i18n="btn_got_it">知道了</button>
+    </div>
+  </div>
+</div>
+
+<!-- 单卡迷你规则弹层 -->
+<div class="overlay card-modal" id="card-modal">
+  <div class="modal">
+    <div class="big-icon" id="card-modal-icon">🛑</div>
+    <div class="card-name" id="card-modal-name">刹车</div>
+    <div class="card-effect" id="card-modal-effect">减速 −10</div>
+    <div class="card-when" id="card-modal-when">何时用：速度偏高、想留余量时</div>
+    <div class="card-example" id="card-modal-example">当前 60，打出刹车 → 50</div>
+    <div class="rules-close-row">
+      <button class="btn" id="card-modal-ok" type="button">知道了</button>
+    </div>
+  </div>
+</div>
+
+<!-- 必爆牌确认弹窗 -->
+<div class="overlay confirm-modal" id="confirm-modal">
+  <div class="modal">
+    <div class="big-icon">⚠️</div>
+    <h2 id="confirm-title" data-i18n="confirm_title">确定出牌？</h2>
+    <p id="confirm-msg" data-i18n="confirm_msg_default">这张会爆胎……</p>
+    <div class="rules-close-row">
+      <button class="btn secondary" id="confirm-no" type="button" data-i18n="btn_think_again">再想想</button>
+      <button class="btn" id="confirm-yes" type="button" data-i18n="btn_confirm_play">确定出</button>
+    </div>
+  </div>
+</div>
+
+<!-- 新手引导覆盖层 -->
+<div class="tutorial-overlay" id="tutorial-overlay">
+  <div class="tutorial-spot" id="tutorial-spot"></div>
+  <div class="tutorial-tip" id="tutorial-tip">
+    <div class="tut-text" id="tutorial-text"></div>
+    <div class="tut-btns">
+      <button class="btn secondary" id="tutorial-skip" type="button" data-i18n="btn_skip">跳过</button>
+      <button class="btn" id="tutorial-next" type="button" data-i18n="btn_next">下一步</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===================== i18n 双语框架 =====================
+const I18N = {
+  zh: {
+    // 开始屏
+    title: '极速101',
+    page_title: '极速101 · 数学竞速',
+    subtitle: '数学竞速 · 别爆胎',
+    title_card_label: '卡通赛车版',
+    title_card_sub: '100以内加减 · 策略博弈',
+    cfg_ai_count: 'AI 数量',
+    cfg_ai_diff: 'AI 难度',
+    opt_ai_1: '1 个', opt_ai_2: '2 个', opt_ai_3: '3 个', opt_ai_4: '4 个', opt_ai_5: '5 个',
+    opt_easy: '简单', opt_medium: '中等', opt_hard: '困难',
+    btn_start: '🚀 发车！',
+    btn_rules: '📖 玩法说明',
+    btn_tutorial: '🎓 玩法教学',
+    start_rules: '<strong>规则：</strong>轮流出牌累加速度，超过 101 爆胎扣 1 轮胎，用完即淘汰。速度牌+1~+12；功能牌：刹车-10、急刹-20、加油+18、调速50、超车（跳过下家）、掉头（反转方向/2人局再来一轮）、连续油门（指定下家连出2张）、升档加速（额外出1张速度牌）、失控反转（101-当前速度）。',
+    // 游戏屏
+    your_hand: '你的手牌',
+    btn_back: '返回主菜单',
+    btn_help: '❓ 玩法',
+    // 结束弹窗
+    end_title_default: '游戏结束',
+    btn_play_again: '再来一局',
+    // 规则弹层
+    rules_modal_title: '📖 玩法说明',
+    btn_got_it: '知道了',
+    // 确认弹窗
+    confirm_title: '确定出牌？',
+    confirm_msg_default: '这张会爆胎……',
+    btn_think_again: '再想想',
+    btn_confirm_play: '确定出',
+    // 引导
+    btn_skip: '跳过',
+    btn_next: '下一步',
+    // 通用
+    you: '你',
+    aria_view_info: '查看说明',
+    cw: '顺时针', ccw: '逆时针',
+    cw_arrow: '顺时针 ↻', ccw_arrow: '逆时针 ↺',
+    tag_safe: '安全', tag_critical: '临界', tag_burst: '爆胎',
+    to: '到',
+    strat_skip: '↷ 跳过下家', strat_reverse: '↺ 反转方向', strat_double: '⚡ 连出2张', strat_extraSpeed: '⬆ 额外出牌', strat_fallback: '策略牌',
+    // 日志 / 出牌描述
+    log_start: '比赛开始！速度上限 101，别爆胎！',
+    log_blowout: '💥 {name} 爆胎了！速度归零，损失 1 个轮胎（剩余 {tires}）',
+    log_double_interrupt: '⚠️ 连续油门因爆胎中断！',
+    log_eliminated: '🏁 {name} 被淘汰！',
+    log_upshift_none: '{name} 升档加速但无速度牌可出，直接继续',
+    desc_speed: '{name} → 速度 {old} → {new}',
+    desc_add: '【{name}】{val} → 速度 {old} → {new}',
+    desc_set: '【{name}】速度直接变为 {new}',
+    desc_skip: '【{name}】跳过 {target}！',
+    desc_reverse2: '【{name}】2人局！跳过对手，{you}再来一轮！',
+    desc_reverse: '【{name}】方向反转！现在{dir}',
+    desc_double: '【{name}】{target} 必须连续出 2 张牌！',
+    desc_upshift: '【{name}】你可以额外出 1 张速度牌！',
+    desc_flip: '【{name}】{old} → {new}（101-{old}）',
+    // 浮动提示
+    tip_upshift: '⬆️ 升档加速：请出一张速度牌',
+    tip_double: '⚡ 连续油门：还需出 {n} 张！',
+    tip_turn: '你的回合 | 方向:{dir}',
+    confirm_burst_msg: '这张会爆胎：打出后到 {s}（超过 101）。确定出牌？',
+    // 结束
+    end_win_title: '你赢了！', end_win_msg: '全程没有爆完轮胎，冠军属于你！',
+    end_lose_title: '游戏结束', end_lose_msg: '{name} 夺得冠军，再接再厉！',
+    end_all_title: '全部出局', end_all_msg: '所有人轮胎都爆光了，再来一局！',
+    // 规则弹层正文
+    rules_goal_title: '🎯 游戏目标',
+    rules_goal_body: '轮流出牌累加速度。速度 <b>超过 101</b> 就会 <b>爆胎</b>，扣 1 个轮胎；<b>3 个轮胎用完</b>即被淘汰。最后存活的人获胜！',
+    rules_how_title: '🕹️ 怎么玩',
+    rules_how_body1: '轮到你时，点手牌即可出牌。会爆胎的牌会 <b>灰显</b>，点它会弹「确定出？」再确认。',
+    rules_how_body2: '卡面底部「<b>到 X</b>」表示打出后的速度：<span style="color:#0a9c7c">✓绿=安全</span> / <span style="color:#e8431f">!橙红=危险(临界)</span> / <span style="color:#c0392b">✕灰=会爆胎</span>。优先出绿色！',
+    rules_deck_title: '🃏 卡组一览',
+    rules_deck_body: '<b>速度牌</b>：+1 ~ +12，每种 4 张（共 48 张），直接累加到当前速度。',
+    th_icon: '图标', th_card: '功能牌', th_effect: '效果', th_when: '何时用',
+    rules_end_title: '💥 爆胎 · 淘汰 · 胜负',
+    rules_end_body1: '速度 <b>&gt; 101</b> 爆胎：速度归零、轮胎 −1。轮胎耗尽即淘汰。所有人都出局则本局结束；你是最后存活者即获胜。',
+    rules_end_body2: '注意：速度恰为 <b>101</b> 不爆胎（属于危险临界），只有 <b>超过</b> 101 才会爆。',
+    rules_tip_title: '💡 小贴士',
+    rules_tip_body: '• 留一张 <b>刹车</b> 保命，关键时刻降速。<br>• 记牌推测对手手里可能有什么。<br>• 用 <b>掉头</b> / <b>连续油门</b> 打乱出牌节奏，给对手制造麻烦。',
+    // 引导步骤
+    tut1: '看这里的速度表：别让速度超过 <b>101（红线）</b>。超过就 <b>爆胎</b> 扣 1 个轮胎，3 个轮胎用完就被淘汰。',
+    tut2: '出牌前看卡面底部「<b>到 X</b>」：<span style="color:#0a9c7c">绿=安全</span>、<span style="color:#e8431f">橙红闪=危险</span>、<span style="color:#c0392b">灰=会爆胎</span>。优先出绿色！',
+    tut2_alt: '留意顶部速度表的 <b>101 红线</b>，自己心算该出哪张：确保打出的牌不会让速度冲过红线即可。',
+    tut3: '功能牌各有绝招，点卡上的 <b>?</b> 看说明。现在出一张试试！',
+  },
+  en: {
+    // Start screen
+    title: 'Speed 101',
+    page_title: 'Speed 101 · Math Race',
+    subtitle: 'Math Race · Avoid the Blowout',
+    title_card_label: 'Cartoon Racing',
+    title_card_sub: 'Add & Subtract within 100 · Strategy',
+    cfg_ai_count: 'AI Count',
+    cfg_ai_diff: 'AI Difficulty',
+    opt_ai_1: '1', opt_ai_2: '2', opt_ai_3: '3', opt_ai_4: '4', opt_ai_5: '5',
+    opt_easy: 'Easy', opt_medium: 'Medium', opt_hard: 'Hard',
+    btn_start: '🚀 Start Race!',
+    btn_rules: '📖 How to Play',
+    btn_tutorial: '🎓 Tutorial',
+    start_rules: '<strong>Rules:</strong> Take turns to build speed; over 101 blows out and costs 1 tire, run out and you are eliminated. Speed cards +1~+12; function cards: Brake −10, Hard Brake −20, Refuel +18, Set to 50, Overtake (skip next), U-Turn (reverse / replay in 2-player), Continuous Throttle (target plays 2), Upshift (extra speed card), Loss-of-Control Reversal (101 − current speed).',
+    // Game screen
+    your_hand: 'Your Hand',
+    btn_back: 'Back to Menu',
+    btn_help: '❓ Help',
+    // End overlay
+    end_title_default: 'Game Over',
+    btn_play_again: 'Play Again',
+    // Rules modal
+    rules_modal_title: '📖 How to Play',
+    btn_got_it: 'Got it',
+    // Confirm modal
+    confirm_title: 'Play this card?',
+    confirm_msg_default: 'This will cause a blowout...',
+    btn_think_again: 'Let me think',
+    btn_confirm_play: 'Play',
+    // Tutorial
+    btn_skip: 'Skip',
+    btn_next: 'Next',
+    // Common
+    you: 'You',
+    aria_view_info: 'View info',
+    cw: 'clockwise', ccw: 'counterclockwise',
+    cw_arrow: 'Clockwise ↻', ccw_arrow: 'Counterclockwise ↺',
+    tag_safe: 'Safe', tag_critical: 'Critical', tag_burst: 'Blowout',
+    to: 'to',
+    strat_skip: '↷ Skip next', strat_reverse: '↺ Reverse', strat_double: '⚡ Play 2', strat_extraSpeed: '⬆ Extra', strat_fallback: 'Strategy',
+    // Logs / play descriptions
+    log_start: 'Race start! Speed cap 101, don\'t blow out!',
+    log_blowout: '💥 {name} blew out! Speed reset, lost 1 tire (remaining {tires})',
+    log_double_interrupt: '⚠️ Continuous throttle interrupted by blowout!',
+    log_eliminated: '🏁 {name} eliminated!',
+    log_upshift_none: '{name} upshifted but has no speed card, continue',
+    desc_speed: '{name} → speed {old} → {new}',
+    desc_add: '【{name}】{val} → speed {old} → {new}',
+    desc_set: '【{name}】speed set to {new}',
+    desc_skip: '【{name}】skipped {target}!',
+    desc_reverse2: '【{name}】2-player game! Skip opponent, {you} go again!',
+    desc_reverse: '【{name}】Direction reversed! Now {dir}',
+    desc_double: '【{name}】{target} must play 2 cards in a row!',
+    desc_upshift: '【{name}】You may play 1 extra speed card!',
+    desc_flip: '【{name}】{old} → {new} (101−{old})',
+    // Floating tips
+    tip_upshift: '⬆️ Upshift: play a speed card',
+    tip_double: '⚡ Continuous throttle: {n} more to play!',
+    tip_turn: 'Your turn | Direction: {dir}',
+    confirm_burst_msg: 'This will blow out: after playing, speed reaches {s} (over 101). Play it?',
+    // End
+    end_win_title: 'You Win!', end_win_msg: 'You kept your tires to the end — champion!',
+    end_lose_title: 'Game Over', end_lose_msg: '{name} takes the crown — try again!',
+    end_all_title: 'All Eliminated', end_all_msg: 'Everyone blew out — play again!',
+    // Rules modal body
+    rules_goal_title: '🎯 Goal',
+    rules_goal_body: 'Take turns playing cards to build speed. If speed goes <b>over 101</b> you <b>blow out</b>, losing 1 tire; use up all <b>3 tires</b> and you are out. Last one standing wins!',
+    rules_how_title: '🕹️ How to Play',
+    rules_how_body1: 'On your turn, tap a card to play it. A card that would blow out is <b>greyed out</b>; tapping it asks \'Play it?\' for confirmation.',
+    rules_how_body2: 'The \'<b>to X</b>\' at the bottom of a card shows speed after playing: <span style="color:#0a9c7c">✓ green = safe</span> / <span style="color:#e8431f">! orange = critical</span> / <span style="color:#c0392b">✕ grey = blowout</span>. Play green first!',
+    rules_deck_title: '🃏 Card Deck',
+    rules_deck_body: '<b>Speed cards</b>: +1 to +12, 4 of each (48 total), added straight to current speed.',
+    th_icon: 'Icon', th_card: 'Card', th_effect: 'Effect', th_when: 'When',
+    rules_end_title: '💥 Blowout · Out · Win/Lose',
+    rules_end_body1: 'Speed <b>&gt; 101</b> = blowout: speed resets to 0, tire −1. No tires left = eliminated. If everyone is out the round ends; survive last to win.',
+    rules_end_body2: 'Note: exactly <b>101</b> is safe (critical), only going <b>over</b> 101 blows out.',
+    rules_tip_title: '💡 Tips',
+    rules_tip_body: '• Keep a <b>Brake</b> as insurance to slow down at key moments.<br>• Count cards to guess what opponents might hold.<br>• Use <b>U-Turn</b> / <b>Continuous Throttle</b> to disrupt the play rhythm and trouble your rivals.',
+    // Tutorial steps
+    tut1: 'Watch the speedometer: don\'t let speed exceed <b>101 (the red line)</b>. Exceeding it <b>blows out</b> and costs 1 tire; use up all 3 tires and you are out.',
+    tut2: 'Before playing, check the \'<b>to X</b>\' at the bottom of a card: <span style="color:#0a9c7c">green = safe</span>, <span style="color:#e8431f">flashing orange = danger</span>, <span style="color:#c0392b">grey = blowout</span>. Play green first!',
+    tut2_alt: 'Watch the <b>101 red line</b> at the top speedometer and calculate in your head which card to play: make sure it won\'t push speed past the red line.',
+    tut3: 'Each function card has a special move — tap the <b>?</b> on a card for details. Now play one!',
+  }
+};
+// 安全访问 localStorage：兼容 jsdom opaque origin / 隐私模式等无存储环境，避免顶层抛错中断脚本
+function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+let LANG = (function () {
+  const s = lsGet('speed101_lang');
+  if (s === 'zh' || s === 'en') return s;
+  return (navigator.language || 'zh').toLowerCase().startsWith('en') ? 'en' : 'zh';
+})();
+function t(key, vars) {
+  const dict = I18N[LANG] || I18N.zh;
+  let s = (dict[key] != null) ? dict[key] : (I18N.zh[key] != null ? I18N.zh[key] : key);
+  if (vars) for (const k in vars) s = s.replace('{' + k + '}', vars[k]);
+  return s;
+}
+function applyStaticLang() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if (k) el.textContent = t(k);
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const k = el.getAttribute('data-i18n-html');
+    if (k) el.innerHTML = t(k);
+  });
+}
+function setLang(lang) {
+  LANG = (lang === 'en') ? 'en' : 'zh';
+  lsSet('speed101_lang', LANG);
+  applyStaticLang();
+  if (typeof renderAll === 'function') renderAll();
+  updateLangToggle();
+}
+// 本地化辅助：玩家名（你 / You）、卡牌名（中文 / 英文）
+function playerName(p) { return p.isPlayer ? t('you') : p.name; }
+function cardLocalName(c) { return (LANG === 'en' && c.en) ? c.en : c.name; }
+function updateLangToggle() {
+  document.querySelectorAll('[data-lang]').forEach(a => {
+    a.classList.toggle('active', a.getAttribute('data-lang') === LANG);
+  });
+}
+
+// ===================== 数据与常量 =====================
+const MAX_SPEED = 101;
+const START_HAND = 3;
+const START_TIRES = 3;
+const CARS = ['🚗', '🚙', '🚕', '🛻', '🚐', '🚓', '🚑'];
+const COLORS = ['#ff6b6b', '#4ecdc4', '#ffd93d', '#a29bfe', '#fd79a8', '#fab1a0', '#74b9ff'];
+
+// 功能牌定义——严格按实物规则书
+// 总计：刹车6 + 急刹2 + 超车4 + 掉头4 + 连续油门4 + 加油2 + 调速50_1 + 升档加速2 + 失控反转1 = 26张
+const FUNC_CARDS = [
+  { name: '刹车',   en: 'Brake',               effect: 'add',    value: -10,           count: 6  },
+  { name: '急刹',   en: 'Hard Brake',          effect: 'add',    value: -20,           count: 2  },
+  { name: '超车',   en: 'Overtake',            effect: 'skip',   value: 0,             count: 4  },
+  { name: '掉头',   en: 'U-Turn',              effect: 'reverse',value: 0,             count: 4  },
+  { name: '连续油门',en: 'Continuous Throttle', effect: 'double', value: 0,             count: 4  },
+  { name: '加油',   en: 'Refuel',              effect: 'add',    value: 18,            count: 2  },
+  { name: '调速50', en: 'Set to 50',           effect: 'set',    value: 50,            count: 1  },
+  { name: '升档加速',en: 'Upshift',            effect: 'extraSpeed', value: 0,        count: 2  },
+  { name: '失控反转',en: 'Loss-of-Control Reversal', effect: 'flip', value: 0,        count: 1  },
+];
+
+// 构建牌堆：速度牌 +1~+12 各4张(共48张) + 功能牌26张 = 74张
+function buildDeck() {
+  const deck = [];
+  // 速度牌：+1 到 +12，每种 4 张
+  for (let v = 1; v <= 12; v++) {
+    for (let i = 0; i < 4; i++) {
+      deck.push({ type: 'speed', value: v, name: `+${v}` });
+    }
+  }
+  // 功能牌
+  FUNC_CARDS.forEach(f => {
+    for (let i = 0; i < f.count; i++) {
+      deck.push({ type: 'func', name: f.name, en: f.en, effect: f.effect, value: f.value });
+    }
+  });
+  return shuffle(deck);
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ===================== 状态 =====================
+let state = null;
+
+function initGame(aiCount, aiLevel) {
+  const deck = buildDeck();
+  const players = [{
+    id: 0, isPlayer: true, name: LANG === 'en' ? 'You' : '你', car: '🏎️', color: '#ff6b6b',
+    tires: START_TIRES, hand: [], alive: true
+  }];
+  for (let i = 1; i <= aiCount; i++) {
+    players.push({
+      id: i, isPlayer: false, name: `AI ${i}`, car: CARS[i % CARS.length], color: COLORS[i % COLORS.length],
+      tires: START_TIRES, hand: [], alive: true, level: aiLevel
+    });
+  }
+  for (let p of players) {
+    for (let k = 0; k < START_HAND; k++) p.hand.push(deck.pop());
+  }
+  state = {
+    deck, discard: [], players,
+    speed: 0,
+    currentIdx: 0,
+    direction: 1,          // 1=顺时针, -1=逆时针(掉头后翻转)
+    upshiftActive: false,  // 升档加速生效中（打出后可额外出1张速度牌）
+    overtakeIdx: null,     // 超车额外回合（保留兼容）
+    doublePlayTarget: null,// 连续油门目标玩家ID，该玩家需连出2张
+    skippedPlayerId: null, // 被超车跳过的玩家ID（回合流转后清空）
+    extraSpeedMode: false, // 升档加速额外出牌模式
+    turnCount: 0,
+    difficulty: aiLevel,   // 'easy' | 'medium' | 'hard'，用于决定是否给出牌提示
+    gameOver: false
+  };
+  log(t('log_start'), 'system');
+  renderAll();
+  if (!state.players[0].isPlayer) setTimeout(aiLoop, 600);
+}
+
+// ===================== 规则引擎 =====================
+function nextAliveIdx(start, dir) {
+  dir = dir || state.direction;
+  let idx = (start + dir + state.players.length) % state.players.length;
+  let guard = 0;
+  while ((!state.players[idx].alive) && guard < 100) {
+    idx = (idx + dir + state.players.length) % state.players.length;
+    guard++;
+  }
+  return idx;
+}
+
+function drawCard(p) {
+  if (state.deck.length === 0) {
+    if (state.discard.length === 0) return;
+    state.deck = shuffle(state.discard);
+    state.discard = [];
+  }
+  p.hand.push(state.deck.pop());
+}
+
+function playCard(p, cardIdx) {
+  if (state.gameOver) return;
+  const card = p.hand[cardIdx];
+  const oldSpeed = state.speed;
+  let newSpeed = oldSpeed;
+  let desc = '';
+  // 默认正常结束回合；特殊牌可能覆盖
+  let endTurn = true;
+  let skipBurstForThisCard = false; // 不直接改变速度的牌
+
+  if (card.type === 'speed') {
+    // 速度牌：+1 ~ +12
+    let val = card.value;
+    newSpeed += val;
+    desc = t('desc_speed', { name: cardLocalName(card), old: oldSpeed, new: newSpeed });
+    if (state.extraSpeedMode) {
+      // 升档加速的额外出牌已完成，恢复正常轮转
+      state.extraSpeedMode = false;
+      endTurn = true;
+    }
+  } else {
+    switch (card.effect) {
+      case 'add': // 刹车-10 / 急刹-20 / 加油+18
+        newSpeed += card.value;
+        if (newSpeed < 0) newSpeed = 0;
+        desc = t('desc_add', { name: cardLocalName(card), val: (card.value > 0 ? '+' : '') + card.value, old: oldSpeed, new: newSpeed });
+        break;
+
+      case 'set': // 调速50
+        newSpeed = card.value;
+        desc = t('desc_set', { name: cardLocalName(card), new: newSpeed });
+        break;
+
+      case 'skip': // 超车：跳过下一位玩家
+        {
+          // 若正处于连续油门连出中，超车会打断连出：先结束连出，再正常超车跳人（避免 doublePlayTarget 残留泄漏）
+          if (state.doublePlayTarget !== null && state.doublePlayRemaining > 0) {
+            state.doublePlayTarget = null;
+            state.doublePlayRemaining = 0;
+          }
+          const nextIdx = nextAliveIdx(state.currentIdx);
+          desc = t('desc_skip', { name: cardLocalName(card), target: playerName(state.players[nextIdx]) });
+          // 标记被跳过的玩家，advanceTurn 时多跳一人
+          state.skippedPlayerId = state.players[nextIdx].id;
+        }
+        break;
+
+      case 'reverse': // 掉头
+        {
+          state.direction *= -1;
+          const aliveCount = state.players.filter(pl => pl.alive).length;
+          if (aliveCount <= 2) {
+            // 2人局：跳过对手，自己再出一轮
+            desc = t('desc_reverse2', { name: cardLocalName(card), you: t('you') });
+            endTurn = false; // 不换人
+            skipBurstForThisCard = true;
+          } else {
+            desc = t('desc_reverse', { name: cardLocalName(card), dir: state.direction > 0 ? t('cw') : t('ccw') });
+          }
+        }
+        break;
+
+      case 'double': // 连续油门：指定下家连出2张
+        {
+          const targetIdx = nextAliveIdx(state.currentIdx);
+          state.doublePlayTarget = state.players[targetIdx].id;
+          state.doublePlayRemaining = 2;
+          desc = t('desc_double', { name: cardLocalName(card), target: playerName(state.players[targetIdx]) });
+          skipBurstForThisCard = true;
+        }
+        break;
+
+      case 'extraSpeed': // 升档加速：额外连出1张速度牌
+        state.extraSpeedMode = true;
+        desc = t('desc_upshift', { name: cardLocalName(card) });
+        skipBurstForThisCard = true;
+        endTurn = false; // 不结束回合，继续出牌
+        break;
+
+      case 'flip': // 失控反转：速度 = 101 - 当前速度
+        newSpeed = MAX_SPEED - oldSpeed;
+        if (newSpeed < 0) newSpeed = 0;
+        desc = t('desc_flip', { name: cardLocalName(card), old: oldSpeed, new: newSpeed });
+        break;
+    }
+  }
+
+  // 移出手牌 → 弃牌堆
+  state.discard.push(...p.hand.splice(cardIdx, 1));
+
+  // 非升档加速额外出状态时，正常补牌
+  if (!state.extraSpeedMode && p.hand.length < START_HAND) {
+    drawCard(p);
+  }
+
+  // 应用速度变化
+  if (!skipBurstForThisCard) {
+    state.speed = newSpeed;
+  }
+
+  log(`${playerName(p)} ${desc}`, p.isPlayer ? 'player' : 'ai');
+
+  // 爆胎判定（仅当速度确实被改变了）
+  if (!skipBurstForThisCard && state.speed > MAX_SPEED) {
+    p.tires -= 1;
+    state.speed = 0;
+    log(t('log_blowout', { name: playerName(p), tires: p.tires }), 'event');
+    burstFx();
+    // 连续油门模式下的爆胎：立即终止连出
+    if (state.doublePlayTarget !== null) {
+      state.doublePlayTarget = null;
+      state.doublePlayRemaining = 0;
+      log(t('log_double_interrupt'), 'event');
+    }
+    // 清除所有临时状态
+    state.extraSpeedMode = false;
+    if (p.tires <= 0) {
+      p.alive = false;
+      log(t('log_eliminated', { name: playerName(p) }), 'event');
+    }
+    endTurn = true; // 爆胎后强制结束回合
+  }
+
+  // 升档加速兜底：若仍处于额外出模式（玩家无速度牌可出），补足牌后无速度牌则自动继续
+  if (state.extraSpeedMode) {
+    while (p.hand.length < START_HAND && state.deck.length > 0) drawCard(p);
+    const hasSpeed = p.hand.some(c => c.type === 'speed');
+    if (!hasSpeed) {
+      state.extraSpeedMode = false;
+      endTurn = true;
+      log(t('log_upshift_none', { name: playerName(p) }), 'system');
+    }
+  }
+
+  // 处理回合计数（连续油门的第二张不计为新回合）
+  if (state.doublePlayTarget === null || state.doublePlayRemaining <= 0) {
+    state.turnCount++;
+  }
+
+  // 回合流转
+  if (!endTurn) {
+    // 不换人（掉头2人局 / 升档加速额外出）
+  } else {
+    // 超车：先跳过一人
+    if (state.skippedPlayerId !== null) {
+      state.currentIdx = nextAliveIdx(state.currentIdx); // 跳过被超者
+      state.currentIdx = nextAliveIdx(state.currentIdx); // 到再下一位
+      state.skippedPlayerId = null;
+    } else if (state.doublePlayTarget !== null && state.doublePlayRemaining > 0) {
+      // 连续油门：切换到目标玩家
+      const tIdx = state.players.findIndex(x => x.id === state.doublePlayTarget && x.alive);
+      if (tIdx >= 0) {
+        state.currentIdx = tIdx;
+        state.doublePlayRemaining--;
+        if (state.doublePlayRemaining <= 0) {
+          state.doublePlayTarget = null;
+        }
+      } else {
+        // 目标已淘汰，恢复正常轮转
+        state.doublePlayTarget = null;
+        state.doublePlayRemaining = 0;
+        advanceTurn();
+      }
+    } else {
+      advanceTurn();
+    }
+  }
+
+  checkGameOver();
+  renderAll();
+  if (!state.gameOver && !state.players[state.currentIdx].isPlayer) {
+    setTimeout(aiLoop, 320 + Math.random() * 260);
+  }
+}
+
+function advanceTurn() {
+  if (state.overtakeIdx !== null) {
+    const idx = state.players.findIndex(x => x.id === state.overtakeIdx && x.alive);
+    state.overtakeIdx = null;
+    if (idx >= 0) { state.currentIdx = idx; return; }
+  }
+  state.currentIdx = nextAliveIdx(state.currentIdx);
+}
+
+function checkGameOver() {
+  const alive = state.players.filter(p => p.alive);
+  if (alive.length <= 1) {
+    state.gameOver = true;
+    const winner = alive[0];
+    setTimeout(() => showEnd(winner), 600);
+  }
+}
+
+// ===================== AI =====================
+function aiLoop() {
+  if (!state || state.gameOver) return;
+  const p = state.players[state.currentIdx];
+  if (p.isPlayer || !p.alive) return;
+
+  // 升档加速额外出模式：AI 只能出速度牌
+  if (state.extraSpeedMode) {
+    const spdIdx = p.hand.findIndex(c => c.type === 'speed');
+    if (spdIdx >= 0) {
+      playCard(p, spdIdx);
+    } else {
+      // 没有速度牌，结束额外模式
+      state.extraSpeedMode = false;
+      advanceTurn();
+      renderAll();
+      setTimeout(aiLoop, 300);
+    }
+    return;
+  }
+
+  const idx = chooseAiCard(p);
+  playCard(p, idx);
+}
+
+function chooseAiCard(p) {
+  const hand = p.hand;
+  const safeIndexes = [];
+  const riskyIndexes = [];
+
+  // 找特殊功能牌索引
+  const skipIdx =       hand.findIndex(c => c.effect === 'skip');
+  const reverseIdx =    hand.findIndex(c => c.effect === 'reverse');
+  const doubleIdx =     hand.findIndex(c => c.effect === 'double');
+  const extraSpeedIdx = hand.findIndex(c => c.effect === 'extraSpeed');
+  const flipIdx =       hand.findIndex(c => c.effect === 'flip');
+  const set50Idx =      hand.findIndex(c => c.effect === 'set');
+  const addBrakeIdx =   hand.findIndex(c => c.effect === 'add' && c.value < 0); // 刹车/急刹
+  const addFuelIdx =    hand.findIndex(c => c.effect === 'add' && c.value > 0); // 加油
+
+  // 分类所有会改变速度的牌
+  hand.forEach((c, i) => {
+    let nextSpeed = state.speed;
+    let simVal = null;
+    if (c.type === 'speed') {
+      nextSpeed += c.value;
+      simVal = c.value;
+    } else if (c.effect === 'add') {
+      nextSpeed += c.value;
+      simVal = c.value;
+    } else if (c.effect === 'set') {
+      nextSpeed = c.value;
+      simVal = c.value - state.speed; // 相当于变化量
+    } else if (c.effect === 'flip') {
+      nextSpeed = MAX_SPEED - state.speed;
+      simVal = nextSpeed - state.speed;
+    }
+    // skip/reverse/double/extraSpeed 不直接改变速度，不在此分类
+    if (simVal !== null) {
+      if (nextSpeed <= MAX_SPEED) safeIndexes.push({ i, nextSpeed, card: c, delta: simVal });
+      else riskyIndexes.push({ i, nextSpeed, card: c });
+    }
+  });
+
+  const level = p.level;
+  const aliveCount = state.players.filter(pl => pl.alive).length;
+  const danger = state.speed >= 85;
+
+  // ===== 简单 AI =====
+  if (level === 'easy') {
+    // 优先安全牌
+    if (safeIndexes.length) {
+      const pick = safeIndexes[Math.floor(Math.random() * safeIndexes.length)];
+      return pick.i;
+    }
+    // 随机出功能牌
+    const funcIdxes = [skipIdx, reverseIdx, doubleIdx, extraSpeedIdx, flipIdx].filter(i => i >= 0);
+    if (funcIdxes.length) return funcIdxes[Math.floor(Math.random() * funcIdxes.length)];
+    return Math.floor(Math.random() * hand.length);
+  }
+
+  // ===== 中等 / 困难 AI =====
+
+  // 1. 危险区域（≥85）：优先降速
+  if (danger) {
+    // 最优先：调速50（直接降到安全区）
+    if (set50Idx >= 0) return set50Idx;
+    // 次优先：急刹-20 / 刹车-10
+    const lowers = safeIndexes.filter(x => x.delta < 0);
+    if (lowers.length) {
+      lowers.sort((a, b) => a.delta - b.delta); // 降最多的排前面
+      return lowers[0].i;
+    }
+    // 失控反转：如果当前速度 > 50，反转后会更低
+    if (flipIdx >= 0 && state.speed > 55) return flipIdx;
+  }
+
+  // 2. 升档加速：配合高数值速度牌
+  if (extraSpeedIdx >= 0 && !danger) {
+    const bigPos = safeIndexes.filter(x => x.card.type === 'speed' && x.card.value >= 8);
+    // 先出升档加速，下张会自动连出
+    if (bigPos.length || state.speed <= 70) return extraSpeedIdx;
+  }
+
+  // 3. 困难 AI：主动施压
+  if (level === 'hard' && !danger) {
+    // 把速度顶到 85~101 之间给下家压力
+    const pushes = safeIndexes.filter(x => x.nextSpeed >= 80 && x.nextSpeed <= MAX_SPEED);
+    if (pushes.length) {
+      pushes.sort((a, b) => b.nextSpeed - a.nextSpeed);
+      return pushes[0].i;
+    }
+    // 连续油门给玩家（尤其是玩家手牌少时）
+    if (doubleIdx >= 0 && state.speed >= 60) {
+      const targetIdx = nextAliveIdx(state.currentIdx);
+      if (state.players[targetIdx].isPlayer) return doubleIdx;
+    }
+  }
+
+  // 4. 超车跳过对手（尤其跳过玩家）
+  if (skipIdx >= 0 && !danger) {
+    const nextIdx = nextAliveIdx(state.currentIdx);
+    // 困难模式下更倾向跳过玩家或领先者
+    if (level === 'hard' || state.speed >= 40) return skipIdx;
+  }
+
+  // 5. 掉头策略
+  if (reverseIdx >= 0) {
+    if (aliveCount <= 2) {
+      // 2人局掉头 = 再来一轮！必出
+      return reverseIdx;
+    }
+    // 多人局：危险时掉头可以改变出牌顺序避开压力
+    if (danger && Math.random() > 0.5) return reverseIdx;
+  }
+
+  // 6. 加油 +18（中等及以上才积极用）
+  if (addFuelIdx >= 0 && !danger && level !== 'easy') {
+    const fuelNext = state.speed + 18;
+    if (fuelNext <= MAX_SPEED) return addFuelIdx;
+  }
+
+  // 7. 失控反转：当速度较低时（≤40），翻转到高位但不爆
+  if (flipIdx >= 0 && !danger && state.speed <= 40) {
+    const flipped = MAX_SPEED - state.speed;
+    if (flipped <= MAX_SPEED) return flipIdx;
+  }
+
+  // 8. 安全牌随机选
+  if (safeIndexes.length) {
+    // 倾向选正数中小一点的（稳健）
+    const moderates = safeIndexes.filter(x => x.nextSpeed >= state.speed && x.nextSpeed <= 85);
+    if (moderates.length) return moderates[Math.floor(Math.random() * moderates.length)].i;
+    return safeIndexes[Math.floor(Math.random() * safeIndexes.length)].i;
+  }
+
+  // 9. 没有安全牌：必须爆，选最小损失
+  if (addBrakeIdx >= 0) return addBrakeIdx;
+  if (set50Idx >= 0) return set50Idx;
+  return riskyIndexes.length ? riskyIndexes[0].i : 0;
+}
+
+// ===================== 渲染 =====================
+function renderAll() {
+  renderRacers();
+  renderSpeedometer();
+  renderHand();
+}
+
+function renderRacers() {
+  const el = document.getElementById('racers');
+  el.innerHTML = '';
+  state.players.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'racer' + (p.isPlayer ? '' : ' ai') + (i === state.currentIdx ? ' active' : '');
+    div.style.opacity = p.alive ? 1 : 0.45;
+    div.innerHTML = `
+      <div class="car" style="${p.alive ? '' : 'filter:grayscale(100%)'}">${p.car}</div>
+      <div class="name">${playerName(p)}</div>
+      <div class="tires">${Array.from({length: START_TIRES}).map((_, ti) => `<span class="tire ${ti < p.tires ? '' : 'lost'}">🛞</span>`).join('')}</div>
+    `;
+    el.appendChild(div);
+  });
+}
+
+function renderSpeedometer() {
+  const val = document.getElementById('speed-value');
+  const needle = document.getElementById('needle');
+  const dial = document.getElementById('speedometer');
+  val.textContent = state.speed;
+  const pct = Math.min(state.speed / MAX_SPEED, 1);
+  const angle = -120 + pct * 240;
+  needle.style.transform = `translate(-50%, -100%) rotate(${angle}deg)`;
+  if (state.speed >= 90) dial.classList.add('danger');
+  else dial.classList.remove('danger');
+}
+
+function renderHand() {
+  const el = document.getElementById('hand');
+  el.innerHTML = '';
+  const p = state.players[0];
+  if (state.gameOver || !p.alive) { el.style.display = 'none'; return; }
+  el.style.display = 'flex';
+  const isTurn = state.players[state.currentIdx].isPlayer;
+  const showHints = state.difficulty === 'easy'; // 仅简单模式给出牌预测提示
+
+  // 升档加速额外出模式：只能出速度牌
+  const speedOnly = state.extraSpeedMode && isTurn;
+  // 连续油门被指定时：必须出（无特殊限制，但显示提示）
+  const isDoubleTarget = state.doublePlayTarget === p.id;
+
+  p.hand.forEach((c, i) => {
+    const div = document.createElement('div');
+    // 根据牌类型设置样式
+    let cls = 'hand-card ';
+    if (c.type === 'speed') {
+      cls += c.value > 0 ? 'speed pos' : 'speed neg';
+    } else {
+      cls += 'func';
+      // 根据功能牌子类型微调颜色
+      if (c.effect === 'add' && c.value < 0) cls += ' func-brake';   // 刹车/急刹 → 青
+      else if (c.effect === 'add' && c.value > 0) cls += ' func-fuel'; // 加油 → 橙红
+      else if (c.effect === 'skip') cls += ' func-skip';             // 超 车 → 紫
+      else if (c.effect === 'reverse') cls += ' func-reverse';       // 掉头 → 粉
+      else if (c.effect === 'double') cls += ' func-double';        // 连续油门→ 红
+      else if (c.effect === 'extraSpeed') cls += ' func-extra';     // 升档加速→ 金
+      else if (c.effect === 'flip') cls += 'func-flip';              // 反转 → 靛蓝
+    }
+    div.className = cls;
+
+    // 是否可点击（非回合 / 升档仅速度牌 → 灰禁用）
+    const clickable = isTurn && !(speedOnly && c.type !== 'speed');
+    if (!clickable) div.classList.add('disabled');
+
+    // 三态判定（基于预测速度，决策阈值与 AI 对齐：85 / 101）
+    const st = cardStatus(c);
+    if (showHints && st === 'burst' && clickable) div.classList.add('will-burst');      // 必爆：灰显但保留点击（仅简单模式提示）
+    if (showHints && st === 'danger' && clickable) div.classList.add('show-danger');    // 危险：橙红边（仅简单模式提示）
+
+    // 卡面内容
+    let mainHtml = '';
+    if (c.type === 'speed') {
+      mainHtml = `<div class="type">SPEED</div><div style="font-size:1.5rem">${c.value > 0 ? '+' : ''}${c.value}</div>`;
+    } else {
+      let icon = '';
+      if (c.effect === 'add' && c.value < 0) icon = '🛑';
+      else if (c.effect === 'add' && c.value > 0) icon = '⛽';
+      else if (c.effect === 'skip') icon = '🏎️💨';
+      else if (c.effect === 'reverse') icon = '↩️';
+      else if (c.effect === 'double') icon = '⚡⚡';
+      else if (c.effect === 'extraSpeed') icon = '⬆️';
+      else if (c.effect === 'flip') icon = '🔄';
+      else if (c.effect === 'set') icon = '🎯';
+      mainHtml = `<div class="type">FUNC</div><div class="name">${icon} ${cardLocalName(c)}</div>`;
+    }
+
+    // 底部状态行（strategy 效果说明始终保留；出牌预测「到 X」仅简单模式）
+    let statusHtml = '';
+    if (st === 'strategy') {
+      const stratMap = { skip: t('strat_skip'), reverse: t('strat_reverse'), double: t('strat_double'), extraSpeed: t('strat_extraSpeed') };
+      statusHtml = `<div class="card-status strategy">${stratMap[c.effect] || t('strat_fallback')}</div>`;
+    } else if (showHints) {
+      const s2 = cardPredict(c);
+      const sym = st === 'safe' ? '✓' : st === 'danger' ? '!' : '✕';
+      const tag = st === 'safe' ? t('tag_safe') : st === 'danger' ? t('tag_critical') : t('tag_burst');
+      statusHtml = `<div class="card-status ${st}">${sym} ${t('to')} ${s2}·${tag}</div>`;
+    }
+
+    // 功能牌右上角 ? 按钮（速度牌不加）
+    const qHtml = (c.type === 'func') ? `<button class="card-q" type="button" aria-label="${t('aria_view_info')}">?</button>` : '';
+    div.innerHTML = mainHtml + statusHtml + qHtml;
+
+    // ? 按钮：看说明（阻止冒泡，避免误触出牌）
+    if (c.type === 'func') {
+      const q = div.querySelector('.card-q');
+      q.addEventListener('click', (e) => { e.stopPropagation(); e.preventDefault(); showCardInfo(c); });
+    }
+
+    // 出牌点击：必爆牌弹确认；首局第3步首次出牌结束引导
+    div.onclick = (e) => {
+      if (e.target.closest('.card-q')) return;
+      if (!clickable) return;
+      if (tut.active && tut.step === 3) finishTutorial();
+      if (st === 'burst') {
+        showConfirm(t('confirm_burst_msg', { s: cardPredict(c) }), () => playCard(p, i));
+        return;
+      }
+      playCard(p, i);
+    };
+    el.appendChild(div);
+  });
+
+  // 状态提示条（保留原有浮动提示）
+  if (speedOnly) {
+    showFloatingTip(t('tip_upshift'), '#ffd93d');
+  } else if (isDoubleTarget && isTurn) {
+    showFloatingTip(t('tip_double', { n: state.doublePlayRemaining }), '#ff6b6b');
+  } else if (isTurn) {
+    const dirText = state.direction > 0 ? t('cw_arrow') : t('ccw_arrow');
+    showFloatingTip(t('tip_turn', { dir: dirText }), '#4ecdc4');
+  }
+}
+
+function showFloatingTip(text, bgColor) {
+  const tip = document.createElement('div');
+  tip.style.cssText = `position:fixed;bottom:10px;left:50%;transform:translateX(-50%);background:${bgColor};color:#fff;padding:8px 18px;border-radius:20px;font-weight:700;font-size:0.85rem;box-shadow:0 4px 12px rgba(0,0,0,0.25);z-index:40;white-space:nowrap;`;
+  tip.textContent = text;
+  document.body.appendChild(tip);
+  setTimeout(() => tip.remove(), 2000);
+}
+
+// ===================== 日志与特效 =====================
+function log(msg, type) {
+  const el = document.getElementById('log');
+  const div = document.createElement('div');
+  div.className = 'entry ' + type;
+  div.textContent = msg;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+
+function burstFx() {
+  const dial = document.getElementById('speedometer');
+  dial.classList.add('shake');
+  setTimeout(() => dial.classList.remove('shake'), 500);
+  // 简单音效占位
+  beep(150, 180, 'sawtooth');
+}
+
+function beep(freq, duration, type = 'sine') {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration / 1000);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(); osc.stop(ctx.currentTime + duration / 1000);
+  } catch(e) {}
+}
+
+// ===================== 弹窗 =====================
+function showEnd(winner) {
+  const overlay = document.getElementById('overlay');
+  const title = document.getElementById('modal-title');
+  const msg = document.getElementById('modal-msg');
+  const icon = document.getElementById('modal-icon');
+  if (winner && winner.isPlayer) {
+    icon.textContent = '🏆'; title.textContent = t('end_win_title'); msg.textContent = t('end_win_msg');
+  } else if (winner) {
+    icon.textContent = '🏁'; title.textContent = t('end_lose_title'); msg.textContent = t('end_lose_msg', { name: winner.name });
+  } else {
+    icon.textContent = '💥'; title.textContent = t('end_all_title'); msg.textContent = t('end_all_msg');
+  }
+  overlay.classList.add('active');
+}
+
+function hideEnd() {
+  document.getElementById('overlay').classList.remove('active');
+}
+
+// ===================== 事件绑定 =====================
+document.getElementById('btn-start').onclick = () => {
+  const aiCount = parseInt(document.getElementById('cfg-ai-count').value, 10);
+  const aiLevel = document.getElementById('cfg-ai-level').value;
+  document.getElementById('screen-start').classList.remove('active');
+  document.getElementById('screen-game').classList.add('active');
+  initGame(aiCount, aiLevel);
+  maybeStartTutorial();
+};
+
+document.getElementById('btn-back').onclick = () => {
+  document.getElementById('screen-game').classList.remove('active');
+  document.getElementById('screen-start').classList.add('active');
+  hideEnd();
+};
+
+document.getElementById('btn-modal').onclick = () => {
+  hideEnd();
+  document.getElementById('btn-back').click();
+};
+
+// ===================== 规则展示与新手引导 =====================
+const TUT_KEY = 'speed101_tutorial_done';
+
+// 功能牌说明（取自 design/ux-optimization.md §3.2.1）
+const CARD_INFO = {
+  '刹车':     { icon: '🛑',    en: 'Brake',     effect: '减速 −10',                 effect_en: 'Slow −10',               when: '速度偏高、想留余量时',          when_en: 'When speed is high and you want a margin',   example: '当前 60，打出刹车 → 50',              example_en: 'Speed 60, play Brake → 50' },
+  '急刹':     { icon: '🛑💢',  en: 'Hard Brake',effect: '急减速 −20',               effect_en: 'Hard slow −20',          when: '接近爆胎线、急需大幅降速',      when_en: 'Near the blowout line, need a big drop',    example: '当前 60，打出急刹 → 40',              example_en: 'Speed 60, play Hard Brake → 40' },
+  '超车':     { icon: '🏎️💨', en: 'Overtake',  effect: '跳过下家',                 effect_en: 'Skip next',              when: '下家快赢 / 想抢节奏时',         when_en: 'Next player is winning / grab the tempo',  example: '当前 60，打出超车 → 跳过下家（速度不变）', example_en: 'Speed 60, play Overtake → skip next (speed unchanged)' },
+  '掉头':     { icon: '↩️',    en: 'U-Turn',    effect: '反转方向 / 2人再来一轮',  effect_en: 'Reverse / 2-player replay', when: '想改变出牌顺序、2人局白赚一轮', when_en: 'Change play order, free round in 2-player', example: '当前 60，打出掉头 → 方向反转（2人局则再来一轮）', example_en: 'Speed 60, play U-Turn → reverse (replay in 2-player)' },
+  '连续油门': { icon: '⚡⚡',  en: 'Continuous Throttle', effect: '指定下家连出 2 张', effect_en: 'Target plays 2 in a row', when: '想给下家（尤其玩家）制造压力', when_en: 'Pressure the next player (esp. you)',     example: '当前 60，打出连续油门 → 下家需连出 2 张',  example_en: 'Speed 60, play Continuous Throttle → target plays 2' },
+  '加油':     { icon: '⛽',    en: 'Refuel',    effect: '加速 +18',                 effect_en: 'Speed +18',               when: '速度低、想快速拉高时',          when_en: 'Low speed, want to climb fast',           example: '当前 60，打出加油 → 78',              example_en: 'Speed 60, play Refuel → 78' },
+  '调速50':   { icon: '🎯',    en: 'Set to 50', effect: '速度设为 50',             effect_en: 'Set speed to 50',         when: '速度过高/过低，想直接重置到中段', when_en: 'Speed too high/low, reset to mid',        example: '当前 60，打出调速50 → 50',            example_en: 'Speed 60, play Set to 50 → 50' },
+  '升档加速': { icon: '⬆️',    en: 'Upshift',   effect: '额外出 1 张速度牌',       effect_en: 'Extra speed card',        when: '手里有高数值速度牌、想连打爆发', when_en: 'Hold a high speed card, chain a burst',    example: '当前 60，打出升档加速 → 可额外出 1 张速度牌', example_en: 'Speed 60, play Upshift → may play 1 extra speed card' },
+  '失控反转': { icon: '🔄',    en: 'Loss-of-Control Reversal', effect: '速度 = 101 − 当前', effect_en: 'Speed = 101 − current', when: '速度低时翻到高位、速度高时翻到低', when_en: 'Low→flip high, high→flip low',         example: '当前 60，打出失控反转 → 41（101−60）', example_en: 'Speed 60, play Reversal → 41 (101−60)' },
+};
+
+// 预测打出某牌后的速度；策略牌（不改速度）返回 null
+function cardPredict(card) {
+  const S = state ? state.speed : 0;
+  if (card.type === 'speed') return S + card.value;
+  if (card.effect === 'add') return Math.max(0, S + card.value);
+  if (card.effect === 'set') return card.value;
+  if (card.effect === 'flip') return Math.max(0, MAX_SPEED - S);
+  return null; // skip / reverse / double / extraSpeed
+}
+// 三态：safe / danger(85~101) / burst(>101) / strategy
+function cardStatus(card) {
+  const s2 = cardPredict(card);
+  if (s2 === null) return 'strategy';
+  if (s2 > MAX_SPEED) return 'burst';
+  if (s2 >= 85) return 'danger';
+  return 'safe';
+}
+
+// ---------- 完整规则弹层 ----------
+function buildRulesBody() {
+  const isEn = LANG === 'en';
+  const rows = Object.keys(CARD_INFO).map(k => {
+    const c = CARD_INFO[k];
+    const name = isEn ? c.en : k;
+    const effect = isEn ? c.effect_en : c.effect;
+    const when = isEn ? c.when_en : c.when;
+    return `<tr><td class="rk-icon">${c.icon}</td><td><b>${name}</b></td><td>${effect}</td><td>${when}</td></tr>`;
+  }).join('');
+  return `
+    <div class="rules-section">
+      <h3>${t('rules_goal_title')}</h3>
+      <p>${t('rules_goal_body')}</p>
+    </div>
+    <div class="rules-section">
+      <h3>${t('rules_how_title')}</h3>
+      <p>${t('rules_how_body1')}</p>
+      <p>${t('rules_how_body2')}</p>
+    </div>
+    <div class="rules-section">
+      <h3>${t('rules_deck_title')}</h3>
+      <p>${t('rules_deck_body')}</p>
+      <table class="rules-table">
+        <thead><tr><th>${t('th_icon')}</th><th>${t('th_card')}</th><th>${t('th_effect')}</th><th>${t('th_when')}</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class="rules-section">
+      <h3>${t('rules_end_title')}</h3>
+      <p>${t('rules_end_body1')}</p>
+      <p>${t('rules_end_body2')}</p>
+    </div>
+    <div class="rules-section">
+      <h3>${t('rules_tip_title')}</h3>
+      <div class="rules-tip">
+        ${t('rules_tip_body')}
+      </div>
+    </div>
+  `;
+}
+function showRules() {
+  document.getElementById('rules-body').innerHTML = buildRulesBody();
+  document.getElementById('rules-modal').classList.add('active');
+}
+function hideRules() { document.getElementById('rules-modal').classList.remove('active'); }
+
+// ---------- 单卡迷你规则 ----------
+function showCardInfo(card) {
+  const c = CARD_INFO[card.name];
+  if (!c) return;
+  const isEn = LANG === 'en';
+  document.getElementById('card-modal-icon').textContent = c.icon;
+  document.getElementById('card-modal-name').textContent = isEn ? c.en : card.name;
+  document.getElementById('card-modal-effect').textContent = isEn ? c.effect_en : c.effect;
+  document.getElementById('card-modal-when').textContent = (isEn ? 'When: ' : '何时用：') + (isEn ? c.when_en : c.when);
+  document.getElementById('card-modal-example').textContent = isEn ? c.example_en : c.example;
+  document.getElementById('card-modal').classList.add('active');
+}
+function hideCardInfo() { document.getElementById('card-modal').classList.remove('active'); }
+
+// ---------- 确认弹窗（必爆牌，不硬禁用避免软锁） ----------
+let confirmYesFn = null;
+function showConfirm(msg, onYes) {
+  document.getElementById('confirm-msg').textContent = msg;
+  confirmYesFn = onYes;
+  document.getElementById('confirm-modal').classList.add('active');
+}
+function hideConfirm() { document.getElementById('confirm-modal').classList.remove('active'); confirmYesFn = null; }
+
+// ---------- 新手引导 ----------
+let tut = { active: false, step: 0, forced: false };
+function maybeStartTutorial() {
+  let done = false;
+  try { done = localStorage.getItem(TUT_KEY) === '1'; } catch (e) {}
+  if (!done) runTutorial(false);
+}
+function startTutorialReplay() {
+  // 不在游戏屏则先开一局，再强制播放
+  if (!document.getElementById('screen-game').classList.contains('active')) {
+    const aiCount = parseInt(document.getElementById('cfg-ai-count').value, 10);
+    const aiLevel = document.getElementById('cfg-ai-level').value;
+    document.getElementById('screen-start').classList.remove('active');
+    document.getElementById('screen-game').classList.add('active');
+    initGame(aiCount, aiLevel);
+  }
+  runTutorial(true);
+}
+function runTutorial(forced) {
+  tut = { active: true, step: 1, forced: !!forced };
+  showTutorialStep(1);
+}
+const TUT_STEPS = {
+  1: { target: 'speedometer', dim: true,  textKey: 'tut1' },
+  2: { target: 'hand',        dim: true,  textKey: 'tut2' },
+  3: { target: 'func',        dim: false, textKey: 'tut3' },
+};
+function showTutorialStep(n) {
+  tut.step = n;
+  const cfg = TUT_STEPS[n];
+  const overlay = document.getElementById('tutorial-overlay');
+  const spot = document.getElementById('tutorial-spot');
+  const tip = document.getElementById('tutorial-tip');
+  const nextBtn = document.getElementById('tutorial-next');
+  overlay.classList.add('active');
+  overlay.classList.toggle('dim', !!cfg.dim);
+  let tutText = t(cfg.textKey);
+  // 第2步：非简单模式无「到 X」提示，引导玩家看速度表红线自己心算
+  if (n === 2 && !(state && state.difficulty === 'easy')) {
+    tutText = t('tut2_alt');
+  }
+  document.getElementById('tutorial-text').innerHTML = tutText;
+  nextBtn.style.display = (n < 3) ? '' : 'none';
+
+  // 选目标元素
+  let target = null;
+  if (cfg.target === 'speedometer') target = document.getElementById('speedometer');
+  else if (cfg.target === 'hand') target = document.getElementById('hand');
+  else if (cfg.target === 'func') {
+    target = document.querySelector('#hand .hand-card.func');
+    if (!target) target = document.getElementById('hand');
+  }
+  if (target) {
+    positionTutorial(target, tip, spot);
+    // 布局稳定后重定位一次
+    requestAnimationFrame(() => { if (tut.active && tut.step === n) positionTutorial(target, tip, spot); });
+  } else {
+    spot.style.display = 'none';
+    tip.style.display = 'none';
+  }
+}
+function positionTutorial(target, tip, spot) {
+  const r = target.getBoundingClientRect();
+  spot.style.display = 'block';
+  spot.style.left = (r.left - 6) + 'px';
+  spot.style.top = (r.top - 6) + 'px';
+  spot.style.width = (r.width + 12) + 'px';
+  spot.style.height = (r.height + 12) + 'px';
+
+  tip.style.display = 'block';
+  const tipH = tip.offsetHeight || 120;
+  const tipW = tip.offsetWidth || 280;
+  let top, left;
+  if (tut.step === 3) {
+    // 底部居中，避免遮挡手牌导致无法点击
+    left = Math.max(8, (window.innerWidth - tipW) / 2);
+    top = Math.max(8, window.innerHeight - tipH - 16);
+  } else {
+    top = r.bottom + 10;
+    if (top + tipH > window.innerHeight - 8) top = Math.max(8, r.top - tipH - 10);
+    left = r.left + r.width / 2 - tipW / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - tipW - 8));
+  }
+  tip.style.top = top + 'px';
+  tip.style.left = left + 'px';
+}
+function finishTutorial() {
+  tut.active = false; tut.step = 0;
+  document.getElementById('tutorial-overlay').classList.remove('active');
+  try { localStorage.setItem(TUT_KEY, '1'); } catch (e) {}
+}
+function skipTutorial() { finishTutorial(); }
+window.addEventListener('resize', () => { if (tut.active) showTutorialStep(tut.step); });
+
+// ---------- 事件绑定（规则 / 引导） ----------
+document.getElementById('btn-rules').onclick = showRules;
+document.getElementById('btn-help').onclick = showRules;
+document.getElementById('btn-tutorial').onclick = startTutorialReplay;
+document.getElementById('rules-x').onclick = hideRules;
+document.getElementById('rules-ok').onclick = hideRules;
+document.getElementById('rules-modal').addEventListener('click', (e) => { if (e.target.id === 'rules-modal') hideRules(); });
+document.getElementById('card-modal-ok').onclick = hideCardInfo;
+document.getElementById('card-modal').addEventListener('click', (e) => { if (e.target.id === 'card-modal') hideCardInfo(); });
+document.getElementById('confirm-no').onclick = hideConfirm;
+document.getElementById('confirm-yes').onclick = () => { const fn = confirmYesFn; hideConfirm(); if (fn) fn(); };
+document.getElementById('confirm-modal').addEventListener('click', (e) => { if (e.target.id === 'confirm-modal') hideConfirm(); });
+document.getElementById('tutorial-next').onclick = () => { if (tut.step < 3) showTutorialStep(tut.step + 1); };
+document.getElementById('tutorial-skip').onclick = skipTutorial;
+
+// ===================== 语言切换绑定 =====================
+document.getElementById('btn-lang').onclick = () => setLang(LANG === 'en' ? 'zh' : 'en');
+document.querySelectorAll('#screen-start [data-lang]').forEach(a => {
+  a.onclick = () => setLang(a.getAttribute('data-lang'));
+});
+
+// 初始化默认语言（LANG 已按 localStorage / 浏览器语言判定）
+applyStaticLang();
+updateLangToggle();
+</script>
+  <section class="play-seo" aria-label="极速101 简介">
+    <div class="wrap" style="max-width:680px;margin:0 auto;padding:18px 14px;color:#eafaf4;">
+      <h2 style="color:#fff;font-size:1.1rem;margin:0 0 8px;">极速101 网页版 · 免费在线卡牌数学竞速</h2>
+      <p style="margin:0;line-height:1.7;">《极速101》（Speed 101）是一款卡通赛车主题的卡牌数学竞速桌游的免费网页版：单人即可对战 1–5 名 AI 车手，用卡牌把「速度」累加到接近 101 却不爆胎。纯前端 H5，浏览器即点即玩，无需下载、注册或联网。完整规则、配件与常见问题见 <a href="index.html" style="color:#bff3e2;">极速101 规则百科与 FAQ</a>。</p>
+    </div>
+  </section>
+  <script>
+    if (window.self === window.top) {
+      var pn = document.getElementById('play-nav');
+      if (pn) pn.style.display = 'flex';
+    }
+  </script>
+<script src="/assets/analytics-loader.js"></script>
+</body>
+</html>

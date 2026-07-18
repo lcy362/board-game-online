@@ -1,0 +1,14 @@
+{
+  "name": "speed101-games",
+  "version": "1.0.0",
+  "private": true,
+  "description": "极速桌游馆 - 免费在线桌游数字平台（Cloudflare Pages 静态站）",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "deploy": "npm run build && wrangler pages deploy dist",
+    "preview": "npm run build && wrangler pages dev dist"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}

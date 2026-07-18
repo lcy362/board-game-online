@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>极速101（Speed 101）· 在线玩 + 完整规则百科与 FAQ</title>
+  <meta name="description" content="极速101（又称极速算力101）是卡通赛车主题的卡牌数学竞速桌游。这里提供免费网页版即玩，并复刻说明书：盒内配件、游戏目标、核心规则、9 种功能牌一览，以及关于人数、爆胎、玩法、购买的常见问题。">
+  <meta name="keywords" content="极速101,极速算力101,极速101 规则,极速101 怎么玩,极速101 功能牌,极速101 爆胎,极速101 几个人玩,卡牌游戏,数学游戏,桌游">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0a9c7c">
+  <meta name="google-site-verification" content="PLACEHOLDER_GSC_VERIFICATION">
+  <link rel="canonical" href="https://speed101.games/games/speed101/">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <meta property="og:title" content="极速101 · 在线玩 + 规则百科与 FAQ">
+  <meta property="og:description" content="免费网页版即玩，并复刻实体桌游说明书：配件、规则、功能牌、常见问题一应俱全。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://speed101.games/games/speed101/">
+  <meta property="og:site_name" content="极速桌游馆">
+  <meta property="og:image" content="https://speed101.games/assets/og-cover.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- 面包屑 -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "首页", "item": "https://speed101.games/index.html" },
+      { "@type": "ListItem", "position": 2, "name": "极速101", "item": "https://speed101.games/games/speed101/" }
+    ]
+  }
+  </script>
+
+  <!-- 游戏实体 -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoGame",
+    "name": "极速101",
+    "alternateName": ["Speed 101", "极速算力101"],
+    "description": "卡通赛车主题的卡牌数学竞速桌游。轮流出牌把速度累加到接近 101 却要爆胎边缘精准收手，比心算也比博弈。",
+    "genre": ["Card Game", "Racing", "Educational", "Math", "Strategy"],
+    "gamePlatform": "Web browser",
+    "applicationCategory": "Game",
+    "operatingSystem": "Any",
+    "inLanguage": ["zh-CN", "en"],
+    "numberOfPlayers": { "@type": "QuantitativeValue", "minValue": 1, "maxValue": 6 },
+    "publisher": { "@type": "Organization", "name": "极速桌游馆" },
+    "url": "https://speed101.games/games/speed101/play.html",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+  }
+  </script>
+
+  <!-- FAQ：承接「极速101 怎么玩」等搜索与答疑 -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "极速101 是什么游戏？和「极速算力101」是同一款吗？",
+        "acceptedAnswer": { "@type": "Answer", "text": "极速101 是一款卡通赛车主题的卡牌数学竞速桌游，也叫「极速算力101」。玩家轮流出牌，把「速度」一路累加到接近 101，却要在爆胎边缘精准收手——既比心算，也比博弈。本站的网页版（Speed 101）是它的数字化改编，可单人 vs AI 即点即玩。" }
+      },
+      {
+        "@type": "Question",
+        "name": "极速101 几个人玩？适合几岁？",
+        "acceptedAnswer": { "@type": "Answer", "text": "实体版支持 2–6 人同场；本网页版支持 1 名玩家对战 1–5 名 AI。适合年龄约 8 岁以上，规则简单、对 100 以内加减法有基本认识即可上手，是家庭与聚会的轻量选择。" }
+      },
+      {
+        "@type": "Question",
+        "name": "极速101 怎么玩？规则是什么？",
+        "acceptedAnswer": { "@type": "Answer", "text": "目标：成为最后一个还握着轮胎的玩家。流程：① 每人发 3 张手牌、3 个轮胎；② 轮流出牌，把牌值累加进当前速度；③ 速度一旦超过 101 即「爆胎」，失去 1 个轮胎、速度归零；④ 轮胎用完被淘汰；⑤ 只剩一名存活者即获胜。数字牌直接累加，功能牌触发特殊效果。" }
+      },
+      {
+        "@type": "Question",
+        "name": "极速101 爆胎是什么意思？超过 101 会怎样？",
+        "acceptedAnswer": { "@type": "Answer", "text": "「爆胎」指当前速度超过了 101 的上限。发生时会立刻失去 1 个轮胎、速度归零，并清除「升档加速」等临时增益。每名玩家只有 3 个轮胎，全部爆光即被淘汰出局。" }
+      },
+      {
+        "@type": "Question",
+        "name": "速度刚好到 101 算爆胎吗？",
+        "acceptedAnswer": { "@type": "Answer", "text": "不算。只有「超过」101（即 102 及以上）才会爆胎；速度恰好等于 101 属于危险临界、安全过关。因此把速度精准停在 101 附近是高风险高回报的策略。" }
+      },
+      {
+        "@type": "Question",
+        "name": "极速101 有哪些功能牌？分别怎么用？",
+        "acceptedAnswer": { "@type": "Answer", "text": "网页版共 9 种功能牌：刹车 −10、急刹 −20、加油 +18、调速50（速度直接设为 50）、超车（跳过下家）、掉头（反转出牌方向；2 人局相当于白赚一轮）、连续油门（指定下家连出 2 张）、升档加速（本回合可额外打出 1 张速度牌）、失控反转（速度变为 101 − 当前速度）。点游戏内卡面的「?」可随时查看单卡说明。" }
+      },
+      {
+        "@type": "Question",
+        "name": "极速101 在哪里买？多少钱？",
+        "acceptedAnswer": { "@type": "Answer", "text": "极速101（极速算力101）是市面上的实体卡牌桌游，可在主流电商平台与桌游渠道购买，价格以各商家实时标价为准。若只想先体验玩法，本站提供完全免费的网页版，打开浏览器即可游玩，无需购买。" }
+      },
+      {
+        "@type": "Question",
+        "name": "极速101 有手机版 / 网页版吗？需要下载吗？",
+        "acceptedAnswer": { "@type": "Answer", "text": "有。本站「极速101 网页版」是纯前端 H5 小游戏，手机、平板、电脑的任意现代浏览器都能直接打开即玩，无需下载 App、无需注册、无需联网（首次加载后离线也能玩）。" }
+      },
+      {
+        "@type": "Question",
+        "name": "网页版（数字版）和实体桌游版有什么区别？",
+        "acceptedAnswer": { "@type": "Answer", "text": "玩法内核一致：速度上限 101、3 个轮胎、爆胎与淘汰规则相同。区别在于：网页版为单人 vs AI（1–5 名，三档难度），自带规则弹层、新手引导和中文/英文切换；实体版是 2–6 人面基对战。网页版已实现 9 种功能牌（共 26 张功能牌），实体说明书提到的扩展牌（如香蕉皮、减速带、捣蛋小恶魔）将在后续版本补充。" }
+      },
+      {
+        "@type": "Question",
+        "name": "极速101 怎么赢？有什么技巧或策略？",
+        "acceptedAnswer": { "@type": "Answer", "text": "核心思路：① 留一张刹车保命，关键时刻降速；② 记牌推测对手手牌；③ 用掉头 / 连续油门打乱出牌节奏给对手制造麻烦；④ 把速度停在 85–101 的「危险区」逼对手先爆胎；⑤ 困难 AI 会主动顶高速度压你，注意预留余量。网页版「简单」难度还会显示每张牌打出后的速度预测。" }
+      },
+      {
+        "@type": "Question",
+        "name": "极速101 的 AI 有几个难度？",
+        "acceptedAnswer": { "@type": "Answer", "text": "网页版提供三档 AI：简单（随机出牌、不主动进攻）、中等（危险区优先减速救急，会用升档、超车扩大优势）、困难（在 80 以上主动把速度顶高逼你爆胎，并配合升档打爆发）。开局可自由选择 AI 数量（1–5）与难度。" }
+      },
+      {
+        "@type": "Question",
+        "name": "极速101 支持中文和英文吗？",
+        "acceptedAnswer": { "@type": "Answer", "text": "支持。网页版内置中文 / English 双语，游戏内点 🌐 即可一键切换，默认按浏览器语言自动选择（中文环境默认中文，其余默认英文）。" }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav" aria-label="主导航">
+    <a class="brand" href="../../index.html"><span class="logo">🏎️</span> 极速桌游馆</a>
+    <button class="nav-toggle" aria-label="展开菜单" aria-expanded="false">☰</button>
+    <div class="nav-links">
+      <a href="../../index.html">首页</a>
+      <a href="#play">在线玩</a>
+      <a href="#intro">游戏介绍</a>
+      <a href="#faq">常见问题</a>
+      <a href="../../index.html#about">关于</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+  <!-- 标题 + 试玩 -->
+  <section class="hero" id="play">
+    <div class="wrap">
+      <h1>极速101 · Speed 101</h1>
+      <p>卡通赛车主题的卡牌数学竞速。把速度累加到接近 101 却不爆胎——既比心算，也拼策略与博弈。下方即开即玩，往下还有完整规则百科与 FAQ。</p>
+      <span class="pill">🃏 74 张卡牌</span>
+      <span class="pill">🤖 1–5 名 AI</span>
+      <span class="pill">🌐 中文 / English</span>
+    </div>
+  </section>
+
+  <section class="play-section">
+    <div class="play-frame">
+      <iframe src="play.html" title="极速101 在线游戏（单人 vs AI）" loading="eager" referrerpolicy="no-referrer"></iframe>
+    </div>
+    <p class="play-links"><a href="play.html" target="_blank" rel="noopener">↗ 在新窗口 / 全屏打开游戏</a> · <a href="../../index.html">返回游戏馆</a></p>
+  </section>
+
+  <!-- 游戏介绍（复刻说明书 + GEO 内容） -->
+  <section class="block" id="intro">
+    <div class="wrap">
+      <article class="article">
+
+        <h2>极速101 是什么</h2>
+        <p class="lead"><b>极速101</b>（又称 <b>极速算力101</b>）是一款卡通赛车主题的<b><a href="https://en.wikipedia.org/wiki/Card_game" target="_blank" rel="noopener">卡牌游戏</a></b>类数学竞速桌游。你和对手轮流打出卡牌，把「速度」从 0 一路累加到接近 <b>101</b>；但只要你让速度<b>超过 101</b>，就会「爆胎」扣分。它把 100 以内的加减法、心算与博弈揉进一局几分钟的快节奏对局里，是家庭与聚会的轻量选择。</p>
+        <p>这一页为你准备了两样东西：① <b>免费的网页版</b>，单人即可对战 1–5 名 AI；② 一份复刻实体桌游说明书的「规则百科」，整理出配件、目标、规则与功能牌一览，方便你随时查阅，也能直接回答「极速101 怎么玩」这类问题。</p>
+
+        <h2>盒内配件（开箱）</h2>
+        <p>依据实体盒装资料，《极速算力101》一套包含：</p>
+        <dl class="termlist">
+          <dt>速度卡牌</dt><dd>48 张（+1 ~ +12 各 4 张），直接累加到当前速度。</dd>
+          <dt>功能牌</dt><dd>26 张，多种特殊效果（刹车、超车、掉头、升档加速等，详见下文卡牌一览）。</dd>
+          <dt>车轮筹码</dt><dd>2 组、每组 30 个，用于记录每位车手的轮胎耐久。</dd>
+          <dt>汽车模型卡</dt><dd>1 张，作为玩家座驾标识。</dd>
+        </dl>
+
+        <h2>游戏目标</h2>
+        <p>轮流出牌，把速度累加到当前总值；<b>最后一名还握着轮胎的车手获胜</b>。你要做的是：尽量把速度推高、逼近 101 拿优势，却在爆胎边缘精准收手。</p>
+
+        <h2>怎么玩（核心规则）</h2>
+        <ol>
+          <li><b>准备</b>：2–6 人（网页版为 1 名玩家 + 1–5 名 AI）。每人发 <b>3 张手牌</b>，拥有 <b>3 个轮胎</b>，速度初始为 0。</li>
+          <li><b>轮流出牌</b>：轮到你时打出一张手牌，把牌值累加进「当前速度」；或打出功能牌触发特殊效果。</li>
+          <li><b>爆胎</b>：一旦速度<b>超过 101</b>，立刻「爆胎」——失去 1 个轮胎、速度归零，并清除「升档加速」等临时增益。</li>
+          <li><b>淘汰</b>：每名车手只有 3 个轮胎，轮胎用完即被淘汰出局。</li>
+          <li><b>胜负</b>：等到只剩一名车手存活，对局结束并弹出结算，存活者夺冠。</li>
+        </ol>
+        <div class="tip"><b>小提醒：</b>速度<b>恰好等于 101</b> 不爆胎，属于危险临界、安全过关；只有<b>超过</b> 101 才会爆。把速度精准停在 101 附近是高风险高回报的策略。</div>
+
+        <h2>卡牌一览</h2>
+        <h3>速度牌（48 张）</h3>
+        <p><b>+1 ~ +12</b>，每种 4 张，直接累加到当前速度。数值越大越能快速拉高速度，也越容易把人推过爆胎线。</p>
+
+        <h3>功能牌（网页版 9 种，共 26 张）</h3>
+        <p>下表对应本网页版已实装的功能牌；点游戏内卡面右上角的「<b>?</b>」也可随时查看单卡说明。</p>
+        <table class="rules-table">
+          <thead>
+            <tr><th class="rk-icon">图标</th><th>功能牌</th><th>效果</th><th>何时用</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="rk-icon">🛑</td><td><b>刹车</b></td><td>减速 −10</td><td>速度偏高、想留余量时</td></tr>
+            <tr><td class="rk-icon">🛑💢</td><td><b>急刹</b></td><td>急减速 −20</td><td>接近爆胎线、急需大幅降速时</td></tr>
+            <tr><td class="rk-icon">⛽</td><td><b>加油</b></td><td>加速 +18</td><td>速度低、想快速拉高时</td></tr>
+            <tr><td class="rk-icon">🎯</td><td><b>调速50</b></td><td>速度直接设为 50</td><td>速度过高/过低，想直接重置到中段</td></tr>
+            <tr><td class="rk-icon">🏎️💨</td><td><b>超车</b></td><td>跳过下一位玩家（速度不变）</td><td>下家快赢、想抢节奏时</td></tr>
+            <tr><td class="rk-icon">↩️</td><td><b>掉头</b></td><td>反转出牌方向；2 人局相当于白赚一轮</td><td>想改变出牌顺序、打乱节奏时</td></tr>
+            <tr><td class="rk-icon">⚡⚡</td><td><b>连续油门</b></td><td>指定下家必须连出 2 张牌</td><td>想给下家（尤其玩家）制造压力时</td></tr>
+            <tr><td class="rk-icon">⬆️</td><td><b>升档加速</b></td><td>本回合可额外打出 1 张速度牌</td><td>手里有高数值速度牌、想连打爆发时</td></tr>
+            <tr><td class="rk-icon">🔄</td><td><b>失控反转</b></td><td>速度 = 101 − 当前速度</td><td>速度低时翻到高位、速度高时翻到低</td></tr>
+          </tbody>
+        </table>
+        <div class="note">实体说明书还提到 <b>加速 +20、香蕉皮 +15、减速带 −10、捣蛋小恶魔</b> 等扩展功能牌，网页版将在后续版本中逐步补充，让数字版更贴近原盒。</div>
+
+        <h2>进阶技巧（怎么赢）</h2>
+        <ul>
+          <li><b>留一张刹车保命</b>：关键时刻降速，避免被迫爆胎。</li>
+          <li><b>记牌</b>：推测对手手里可能有什么，预判谁会被逼爆。</li>
+          <li><b>用掉头 / 连续油门打乱节奏</b>：给对手制造麻烦，尤其是逼玩家先爆。</li>
+          <li><b>停在危险区</b>：把速度压在 85–101，增加下家爆胎概率。</li>
+          <li><b>提防困难 AI</b>：它会主动顶高速度压你，务必预留余量。</li>
+        </ul>
+
+        <h2>网页版（数字版）说明</h2>
+        <p>本网页版是《极速101》的数字化改编，与原盒玩法内核一致（速度上限 101、3 个轮胎、爆胎与淘汰规则相同），并做了轻量增强：</p>
+        <ul>
+          <li><b>单人 vs AI</b>：开局可选 AI 数量（1–5）与难度（简单 / 中等 / 困难）。</li>
+          <li><b>即时双语</b>：游戏内点 🌐 一键切换 中文 / English，默认按浏览器语言自动选择。</li>
+          <li><b>规则弹层 + 新手引导</b>：首局有 3 步互动教学，卡面「?」随时看单卡说明。</li>
+          <li><b>零安装</b>：纯前端 H5，浏览器直接打开即玩，无需下载、注册或联网。</li>
+        </ul>
+        <div class="tip"><b>模式对照：</b>实体版是 <b>2–6 人面基对战</b>；网页版目前是 <b>单人 vs AI</b>。两者规则互通，先在网上练手、再约朋友面基都很合适。</div>
+
+      </article>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="block" id="faq" style="background:#fff;border-top:1px solid var(--line);">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>常见问题（FAQ）</h2>
+        <p>关于极速101 的人数、规则、爆胎、功能牌与购买，这里一次说清。</p>
+      </div>
+      <div class="faq">
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">极速101 是什么游戏？和「极速算力101」是同一款吗？<span class="chev">+</span></button>
+          <div class="faq-a"><div class="inner"><p>极速101 是一款卡通赛车主题的卡牌数学竞速桌游，也叫「极速算力101」。玩家轮流出牌，把「速度」一路累加到接近 101，却要在爆胎边缘精准收手——既比心算，也比博弈。本站的网页版（Speed 101）是它的数字化改编，可单人 vs AI 即点即玩。</p></div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">极速101 几个人玩？适合几岁？<span class="chev">+</span></button>
+          <div class="faq-a"><div class="inner"><p>实体版支持 2–6 人同场；本网页版支持 1 名玩家对战 1–5 名 AI。适合年龄约 8 岁以上，规则简单、对 100 以内加减法有基本认识即可上手，是家庭与聚会的轻量选择。</p></div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">极速101 怎么玩？规则是什么？<span class="chev">+</span></button>
+          <div class="faq-a"><div class="inner"><p>目标：成为最后一个还握着轮胎的玩家。流程：① 每人发 3 张手牌、3 个轮胎；② 轮流出牌，把牌值累加进当前速度；③ 速度一旦超过 101 即「爆胎」，失去 1 个轮胎、速度归零；④ 轮胎用完被淘汰；⑤ 只剩一名存活者即获胜。数字牌直接累加，功能牌触发特殊效果。</p></div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">极速101 爆胎是什么意思？超过 101 会怎样？<span class="chev">+</span></button>
+          <div class="faq-a"><div class="inner"><p>「爆胎」指当前速度超过了 101 的上限。发生时会立刻失去 1 个轮胎、速度归零，并清除「升档加速」等临时增益。每名玩家只有 3 个轮胎，全部爆光即被淘汰出局。</p></div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">速度刚好到 101 算爆胎吗？<span class="chev">+</span></button>
+          <div class="faq-a"><div class="inner"><p>不算。只有「超过」101（即 102 及以上）才会爆胎；速度恰好等于 101 属于危险临界、安全过关。因此把速度精准停在 101 附近是高风险高回报的策略。</p></div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">极速101 有哪些功能牌？分别怎么用？<span class="chev">+</span></button>
+          <div class="faq-a"><div class="inner"><p>网页版共 9 种功能牌：刹车 −10、急刹 −20、加油 +18、调速50（速度直接设为 50）、超车（跳过下家）、掉头（反转出牌方向；2 人局相当于白赚一轮）、连续油门（指定下家连出 2 张）、升档加速（本回合可额外打出 1 张速度牌）、失控反转（速度变为 101 − 当前速度）。点游戏内卡面的「?」可随时查看单卡说明。</p></div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">极速101 在哪里买？多少钱？<span class="chev">+</span></button>
+          <div class="faq-a"><div class="inner"><p>极速101（极速算力101）是市面上的实体卡牌桌游，可在主流电商平台与桌游渠道购买，价格以各商家实时标价为准。若只想先体验玩法，本站提供完全免费的网页版，打开浏览器即可游玩，无需购买。</p></div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">极速101 有手机版 / 网页版吗？需要下载吗？<span class="chev">+</span></button>
+          <div class="faq-a"><div class="inner"><p>有。本站「极速101 网页版」是纯前端 H5 小游戏，手机、平板、电脑的任意现代浏览器都能直接打开即玩，无需下载 App、无需注册、无需联网（首次加载后离线也能玩）。</p></div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">网页版（数字版）和实体桌游版有什么区别？<span class="chev">+</span></button>
+          <div class="faq-a"><div class="inner"><p>玩法内核一致：速度上限 101、3 个轮胎、爆胎与淘汰规则相同。区别在于：网页版为单人 vs AI（1–5 名，三档难度），自带规则弹层、新手引导和中文/英文切换；实体版是 2–6 人面基对战。网页版已实现 9 种功能牌（共 26 张功能牌），实体说明书提到的扩展牌（如香蕉皮、减速带、捣蛋小恶魔）将在后续版本补充。</p></div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">极速101 怎么赢？有什么技巧或策略？<span class="chev">+</span></button>
+          <div class="faq-a"><div class="inner"><p>核心思路：① 留一张刹车保命，关键时刻降速；② 记牌推测对手手牌；③ 用掉头 / 连续油门打乱出牌节奏给对手制造麻烦；④ 把速度停在 85–101 的「危险区」逼对手先爆胎；⑤ 困难 AI 会主动顶高速度压你，注意预留余量。网页版「简单」难度还会显示每张牌打出后的速度预测。</p></div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">极速101 的 AI 有几个难度？<span class="chev">+</span></button>
+          <div class="faq-a"><div class="inner"><p>网页版提供三档 AI：简单（随机出牌、不主动进攻）、中等（危险区优先减速救急，会用升档、超车扩大优势）、困难（在 80 以上主动把速度顶高逼你爆胎，并配合升档打爆发）。开局可自由选择 AI 数量（1–5）与难度。</p></div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false">极速101 支持中文和英文吗？<span class="chev">+</span></button>
+          <div class="faq-a"><div class="inner"><p>支持。网页版内置中文 / English 双语，游戏内点 🌐 即可一键切换，默认按浏览器语言自动选择（中文环境默认中文，其余默认英文）。</p></div></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap" style="text-align:center;">
+      <a class="btn btn-primary" href="#play">▶ 回到顶部，立即游玩</a>
+      <div style="margin-top:14px;"><a href="../../index.html">← 返回极速桌游馆</a></div>
+      <div style="margin-top:10px;font-size:.9rem;color:#666;">想玩更多？看看 <a href="../../index.html#coming">极速桌游馆更多免费桌游</a>。</div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="cols">
+      <div class="col">
+        <h4>极速桌游馆</h4>
+        <a href="../../index.html">首页</a>
+        <a href="../../index.html#games">游戏馆</a>
+        <a href="../../index.html#about">关于项目</a>
+      </div>
+      <div class="col">
+        <h4>极速101</h4>
+        <a href="#play">在线游玩</a>
+        <a href="#intro">游戏介绍</a>
+        <a href="#faq">常见问题</a>
+      </div>
+      <div class="col">
+        <h4>相关</h4>
+        <a href="../../index.html#coming">更多桌游</a>
+        <a href="#intro">规则百科</a>
+      </div>
+    </div>
+    <div class="legal">
+      © <span data-year>2026</span> 极速桌游馆 · 本站内容为《极速101》的粉丝向数字化改编，非官方出版。 · 游戏名称商标归各自权利人所有。
+    </div>
+  </div>
+</footer>
+
+<script src="../../assets/site.js"></script>
+<script src="/assets/analytics-loader.js"></script>
+</body>
+</html>

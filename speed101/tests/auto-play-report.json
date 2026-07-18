@@ -1,0 +1,177 @@
+{
+  "syntaxOk": true,
+  "targeted": [
+    {
+      "name": "A. 升档加速后无速度牌 → 不卡死",
+      "pass": true,
+      "detail": "extraSpeedMode=false(期望 false), currentIdx 0->1, gameOver=false"
+    },
+    {
+      "name": "B. 升档加速后出速度牌 → 关闭模式(无泄漏)",
+      "pass": true,
+      "detail": "升档后 extraSpeedMode=true(期望 true), 出速度牌后 extraSpeedMode=false(期望 false), currentIdx 0->1"
+    }
+  ],
+  "total": 300,
+  "completionPass": 300,
+  "completionRate": 1,
+  "turnSkipCount": 0,
+  "deadlockFixVerdict": "生效（定向+随机对局均无卡死/模式泄漏）",
+  "deadlockStills": 0,
+  "newBugs": [],
+  "anomalyCounters": {},
+  "comboStats": {
+    "1|easy": {
+      "total": 20,
+      "pass": 20
+    },
+    "2|easy": {
+      "total": 20,
+      "pass": 20
+    },
+    "3|easy": {
+      "total": 20,
+      "pass": 20
+    },
+    "4|easy": {
+      "total": 20,
+      "pass": 20
+    },
+    "5|easy": {
+      "total": 20,
+      "pass": 20
+    },
+    "1|medium": {
+      "total": 20,
+      "pass": 20
+    },
+    "2|medium": {
+      "total": 20,
+      "pass": 20
+    },
+    "3|medium": {
+      "total": 20,
+      "pass": 20
+    },
+    "4|medium": {
+      "total": 20,
+      "pass": 20
+    },
+    "5|medium": {
+      "total": 20,
+      "pass": 20
+    },
+    "1|hard": {
+      "total": 20,
+      "pass": 20
+    },
+    "2|hard": {
+      "total": 20,
+      "pass": 20
+    },
+    "3|hard": {
+      "total": 20,
+      "pass": 20
+    },
+    "4|hard": {
+      "total": 20,
+      "pass": 20
+    },
+    "5|hard": {
+      "total": 20,
+      "pass": 20
+    }
+  },
+  "sampledGameDetails": [
+    {
+      "gi": 0,
+      "aiCount": 1,
+      "level": "easy",
+      "steps": 98,
+      "gameOver": true,
+      "ok": true,
+      "anomalies": []
+    },
+    {
+      "gi": 1,
+      "aiCount": 2,
+      "level": "easy",
+      "steps": 207,
+      "gameOver": true,
+      "ok": true,
+      "anomalies": []
+    },
+    {
+      "gi": 2,
+      "aiCount": 3,
+      "level": "easy",
+      "steps": 275,
+      "gameOver": true,
+      "ok": true,
+      "anomalies": []
+    },
+    {
+      "gi": 3,
+      "aiCount": 4,
+      "level": "easy",
+      "steps": 465,
+      "gameOver": true,
+      "ok": true,
+      "anomalies": []
+    },
+    {
+      "gi": 4,
+      "aiCount": 5,
+      "level": "easy",
+      "steps": 520,
+      "gameOver": true,
+      "ok": true,
+      "anomalies": []
+    },
+    {
+      "gi": 5,
+      "aiCount": 1,
+      "level": "medium",
+      "steps": 100,
+      "gameOver": true,
+      "ok": true,
+      "anomalies": []
+    },
+    {
+      "gi": 6,
+      "aiCount": 2,
+      "level": "medium",
+      "steps": 265,
+      "gameOver": true,
+      "ok": true,
+      "anomalies": []
+    },
+    {
+      "gi": 7,
+      "aiCount": 3,
+      "level": "medium",
+      "steps": 349,
+      "gameOver": true,
+      "ok": true,
+      "anomalies": []
+    },
+    {
+      "gi": 8,
+      "aiCount": 4,
+      "level": "medium",
+      "steps": 409,
+      "gameOver": true,
+      "ok": true,
+      "anomalies": []
+    },
+    {
+      "gi": 9,
+      "aiCount": 5,
+      "level": "medium",
+      "steps": 676,
+      "gameOver": true,
+      "ok": true,
+      "anomalies": []
+    }
+  ]
+}

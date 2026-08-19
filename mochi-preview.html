@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>萌可图片识别 · 用于 AI_ROLES 映射</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: #f5f7fa; color: #2d3436; }
+    h1 { margin: 0 0 8px; font-size: 1.4rem; }
+    .desc { color: #636e72; font-size: 0.9rem; margin-bottom: 20px; line-height: 1.6; }
+    .desc code { background: #dfe6e9; padding: 1px 6px; border-radius: 4px; font-size: 0.85em; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+    .card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: transform 0.15s; cursor: pointer; }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+    .card .img-wrap { width: 100%; aspect-ratio: 1; background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .card .img-wrap img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .card .info { padding: 10px 12px; }
+    .card .filename { font-family: 'SF Mono', Menlo, monospace; font-size: 0.72rem; color: #636e72; word-break: break-all; }
+    .card .guess { margin-top: 6px; font-size: 0.85rem; font-weight: 700; color: #2d3436; min-height: 1.2em; }
+    .card.mapped .guess { color: #00b894; }
+    .card.mapped { border: 2px solid #00b894; }
+    .toolbar { position: sticky; top: 0; background: #f5f7fa; padding: 14px 0; margin-bottom: 16px; z-index: 10; border-bottom: 1px solid #dfe6e9; }
+    .toolbar button { padding: 10px 18px; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 700; cursor: pointer; margin-right: 8px; }
+    .toolbar .btn-export { background: #6c5ce7; color: #fff; }
+    .toolbar .btn-clear { background: #dfe6e9; color: #2d3436; }
+    .toolbar .btn-export:disabled { background: #b2bec3; cursor: not-allowed; }
+    .toolbar .stat { display: inline-block; margin-left: 12px; color: #636e72; font-size: 0.85rem; }
+    dialog { border: none; border-radius: 14px; padding: 0; max-width: 480px; width: 92%; }
+    dialog::backdrop { background: rgba(0,0,0,0.5); }
+    .modal-body { padding: 20px; }
+    .modal-body h3 { margin: 0 0 12px; font-size: 1.1rem; }
+    .modal-body .img-preview { width: 120px; height: 120px; background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+    .modal-body .img-preview img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .modal-body select, .modal-body input { width: 100%; padding: 10px; border: 1px solid #dfe6e9; border-radius: 8px; font-size: 0.9rem; margin-bottom: 10px; }
+    .modal-body .actions { display: flex; gap: 8px; margin-top: 14px; }
+    .modal-body .actions button { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
+    .modal-body .actions .ok { background: #6c5ce7; color: #fff; }
+    .modal-body .actions .cancel { background: #dfe6e9; color: #2d3436; }
+    .modal-body .filter-list { max-height: 280px; overflow-y: auto; border: 1px solid #dfe6e9; border-radius: 8px; padding: 6px; margin-top: 6px; }
+    .modal-body .filter-list label { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; }
+    .modal-body .filter-list label:hover { background: #f1f3f5; }
+    .modal-body .filter-list input { width: auto; margin: 0; }
+    .output { background: #2d3436; color: #dfe6e9; padding: 14px; border-radius: 10px; font-family: 'SF Mono', Menlo, monospace; font-size: 0.78rem; white-space: pre-wrap; word-break: break-all; max-height: 320px; overflow-y: auto; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <h1>🧸 萌可图片识别</h1>
+  <div class="desc">
+    点击任一图片卡片，在弹出框中选择该图对应的角色名。完成后点击「导出映射」可生成代码片段。
+    <br>已下载 <code id="total-count">0</code> 张图，当前已映射 <code id="mapped-count">0</code> 张。
+  </div>
+
+  <div class="toolbar">
+    <button class="btn-export" id="btn-export" disabled>📋 导出映射代码</button>
+    <button class="btn-clear" id="btn-clear">🗑️ 清空映射</button>
+    <span class="stat" id="stat"></span>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <dialog id="dlg">
+    <div class="modal-body">
+      <h3>为该图选择对应角色</h3>
+      <div class="img-preview"><img id="dlg-img" src="" alt=""></div>
+      <div style="font-family:monospace;font-size:0.78rem;color:#636e72;text-align:center" id="dlg-filename"></div>
+      <input type="text" id="dlg-filter" placeholder="搜索角色名（中文或英文）" autocomplete="off">
+      <div class="filter-list" id="dlg-list"></div>
+      <div class="actions">
+        <button class="cancel" id="dlg-cancel">取消</button>
+        <button class="ok" id="dlg-ok">确认</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="dlg-export">
+    <div class="modal-body">
+      <h3>📋 映射代码（可复制粘贴给 AI）</h3>
+      <div class="output" id="output-text"></div>
+      <div class="actions">
+        <button class="cancel" id="copy-cancel">关闭</button>
+        <button class="ok" id="copy-btn">📋 复制到剪贴板</button>
+      </div>
+    </div>
+  </dialog>
+
+<script>
+const ROLES = [
+  { name: '爱心萌可', en: 'Heartsping Mochi', icon: '💗' },
+  { name: '闪闪萌可', en: 'Sparkle Mochi',  icon: '✨' },
+  { name: '软软萌可', en: 'Jelly Mochi',    icon: '🍮' },
+  { name: '绵绵萌可', en: 'Fluffy Mochi',   icon: '🍥' },
+  { name: '泡泡萌可', en: 'Bubblegum Mochi', icon: '🫧' },
+  { name: '酸酸萌可', en: 'Sour Mochi',     icon: '🍋' },
+  { name: '甜甜萌可', en: 'Sweet Mochi',    icon: '🍯' },
+  { name: '糖糖萌可', en: 'Candy Mochi',    icon: '🍭' },
+  { name: '奶油萌可', en: 'Meringue Mochi', icon: '🍰' },
+  { name: '夹心萌可', en: 'Filling Mochi',  icon: '🥐' },
+  { name: '甜甜圈萌可', en: 'Donut Mochi',  icon: '🍩' },
+  { name: '华夫萌可', en: 'Waffle Mochi',   icon: '🧇' },
+  { name: '棒棒糖萌可', en: 'Lollipop Mochi', icon: '🍡' },
+  { name: '马卡龙萌可', en: 'Macaron Mochi',  icon: '🧁' },
+  { name: '松饼萌可', en: 'Pancake Mochi',  icon: '🥞' },
+  { name: '蛋糕弟弟萌可', en: 'Muffin Mochi',   icon: '🍪' },
+  { name: '蛋糕妹妹萌可', en: 'Cupcake Mochi',  icon: '🧁' },
+  { name: '酸奶萌可', en: 'Yogurt Mochi',   icon: '🥛' },
+  { name: '冰沙萌可', en: 'Snow Ice Mochi', icon: '🍧' },
+  { name: '布丁萌可', en: 'Pudding Mochi',  icon: '🍮' },
+  { name: '棉花糖萌可', en: 'Cotton Mochi',   icon: '🍡' },
+  { name: '巧克力萌可', en: 'Choco Mochi',    icon: '🍫' },
+  { name: '银光萌可', en: 'Silver Mochi',   icon: '🌙' },
+  { name: '星光萌可', en: 'Starlight Mochi',icon: '⭐' },
+  { name: '月光萌可', en: 'Moonlight Mochi',icon: '🌕' },
+  { name: '兔兔萌可', en: 'Bunny Mochi',    icon: '🐰' },
+  { name: '呼啦萌可', en: 'Hula Mochi',     icon: '🌺' },
+  { name: '光明萌可', en: 'Light Mochi',    icon: '💡' },
+  { name: '叮咚萌可', en: 'Ding Dong Mochi',icon: '🔔' },
+  { name: '流浪萌可', en: 'Wanderer Mochi', icon: '🎒' },
+  { name: '动动萌可', en: 'Active Mochi',   icon: '🏃' },
+  { name: '贴贴萌可', en: 'Huggy Mochi',    icon: '🤗' },
+  { name: '熊熊萌可', en: 'Bear Mochi',     icon: '🧸' },
+  { name: '缤缤萌可', en: 'Colorful Mochi',icon: '🎨' },
+  { name: '纷纷萌可', en: 'Snowy Mochi',    icon: '🌨️' },
+  { name: '绵羊萌可', en: 'Sheep Mochi',    icon: '🐑' },
+  { name: '透明萌可', en: 'Invisible Mochi',icon: '👻' },
+  { name: '共共萌可', en: 'Sharing Mochi',  icon: '🤝' },
+  { name: '跳舞萌可', en: 'Dancer Mochi',   icon: '💃' },
+  { name: '狐狐萌可', en: 'Fox Mochi',      icon: '🦊' },
+  { name: '歌谣萌可', en: 'Ballad Mochi',   icon: '🎵' },
+  { name: '乐美萌可', en: 'Yue Mei Mochi',  icon: '💖' },
+  { name: '悄悄萌可', en: 'Quiet Mochi',    icon: '🤫' },
+  { name: '亲亲萌可', en: 'Kissy Mochi',    icon: '😘' },
+  { name: '王子萌可', en: 'Prince Mochi',   icon: '🤴' },
+  { name: '极光萌可', en: 'Aurora Mochi',   icon: '🌈' },
+];
+
+// 从同目录读取图片文件名清单（用 fetch 拿 index 不实际，直接预置）
+const IMAGES = ["1mSlXx4ZcQXowX8","8gSM7wgDFgwBDoO","AvS4Mv52sw9O261","JOS9nyeYFWBLY61","JOS9nyeYFWBLYBY","JOS9nyeYFWBLYa5","LySXn8vbIqWOb2B","LySXn8vbIqWObL4","M6SoJdXgUBN0gNN","M6SoJdXgUBN0gaL","N5SwzA8dUP8zdZd","N5SwzA8dUP8zdgo","N5SwzA8dUP8zdy2","YxSz5qO7FqE97Eg","d3SjY60VhqPjgPX","d3SjY60VhqPjgYD","oVSqZQOjhgNyn16","oVSqZQOjhgNynmp","pGSLXq5QcBx968P","pGSLXq5QcBx96Ol","vDSBNvbeHdg3O6W","vDSBNvbeHdg3Ogb","xDSWymBLt2xb43j","y9SB9aqNHb25pnE","z2SeBwMahxGV8dw"];
+
+const mapping = {}; // filename -> roleName
+let currentImg = null;
+let pickedRole = null;
+
+const grid = document.getElementById('grid');
+const dlg = document.getElementById('dlg');
+const dlgImg = document.getElementById('dlg-img');
+const dlgFilename = document.getElementById('dlg-filename');
+const dlgFilter = document.getElementById('dlg-filter');
+const dlgList = document.getElementById('dlg-list');
+const dlgOk = document.getElementById('dlg-ok');
+const dlgCancel = document.getElementById('dlg-cancel');
+const dlgExport = document.getElementById('dlg-export');
+const outputText = document.getElementById('output-text');
+const copyBtn = document.getElementById('copy-btn');
+const copyCancel = document.getElementById('copy-cancel');
+const btnExport = document.getElementById('btn-export');
+const btnClear = document.getElementById('btn-clear');
+const totalCount = document.getElementById('total-count');
+const mappedCount = document.getElementById('mapped-count');
+const stat = document.getElementById('stat');
+
+totalCount.textContent = IMAGES.length;
+
+function renderGrid() {
+  grid.innerHTML = '';
+  IMAGES.forEach(fn => {
+    const c = document.createElement('div');
+    c.className = 'card' + (mapping[fn] ? ' mapped' : '');
+    c.innerHTML = `
+      <div class="img-wrap"><img src="assets/mochi/${fn}.png" loading="lazy" alt="${fn}"></div>
+      <div class="info">
+        <div class="filename">${fn}.png</div>
+        <div class="guess">${mapping[fn] ? (mapping[fn] + ' ' + (ROLES.find(r=>r.name===mapping[fn])?.icon || '')) : '点击选择角色'}</div>
+      </div>
+    `;
+    c.onclick = () => openDialog(fn);
+    grid.appendChild(c);
+  });
+  updateStat();
+}
+
+function updateStat() {
+  const m = Object.keys(mapping).length;
+  mappedCount.textContent = m;
+  btnExport.disabled = m === 0;
+  stat.textContent = m === 0 ? '尚未识别任何图' : `已识别 ${m}/${IMAGES.length}`;
+}
+
+function openDialog(fn) {
+  currentImg = fn;
+  pickedRole = mapping[fn] || null;
+  dlgImg.src = `assets/mochi/${fn}.png`;
+  dlgFilename.textContent = fn + '.png';
+  dlgFilter.value = '';
+  renderRoleList('');
+  dlg.showModal();
+}
+
+function renderRoleList(filter) {
+  const f = filter.toLowerCase().trim();
+  const used = new Set(Object.values(mapping));
+  const list = ROLES.filter(r =>
+    !f || r.name.toLowerCase().includes(f) || r.en.toLowerCase().includes(f)
+  );
+  // 排序：未用的在前
+  list.sort((a, b) => (used.has(a.name)?1:0) - (used.has(b.name)?1:0));
+  dlgList.innerHTML = '';
+  list.forEach(r => {
+    const label = document.createElement('label');
+    const disabled = used.has(r.name) && r.name !== pickedRole;
+    label.innerHTML = `<input type="radio" name="role" value="${r.name}" ${r.name===pickedRole?'checked':''} ${disabled?'disabled':''}> ${r.icon} ${r.name} <span style="color:#b2bec3;font-size:0.78rem;margin-left:auto">${r.en}</span>`;
+    dlgList.appendChild(label);
+  });
+}
+
+dlgFilter.addEventListener('input', e => renderRoleList(e.target.value));
+dlgList.addEventListener('change', e => {
+  if (e.target.name === 'role') pickedRole = e.target.value;
+});
+
+dlgOk.onclick = () => {
+  if (pickedRole) {
+    // 取消该角色在其他图的映射
+    Object.keys(mapping).forEach(k => { if (mapping[k] === pickedRole) delete mapping[k]; });
+    mapping[currentImg] = pickedRole;
+  }
+  dlg.close();
+  renderGrid();
+};
+
+dlgCancel.onclick = () => dlg.close();
+
+btnClear.onclick = () => {
+  if (confirm('确定要清空所有映射？')) {
+    Object.keys(mapping).forEach(k => delete mapping[k]);
+    renderGrid();
+  }
+};
+
+btnExport.onclick = () => {
+  const lines = Object.entries(mapping).map(([fn, name]) =>
+    `  '${name}': '${fn}.png'`
+  ).join(',\n');
+  outputText.textContent = `// 萌可图片映射表（filename -> 角色名）\nconst MOCHI_IMG = {\n${lines}\n};`;
+  dlgExport.showModal();
+};
+
+copyBtn.onclick = async () => {
+  try {
+    await navigator.clipboard.writeText(outputText.textContent);
+    copyBtn.textContent = '✅ 已复制';
+    setTimeout(() => copyBtn.textContent = '📋 复制到剪贴板', 1500);
+  } catch (e) {
+    alert('复制失败，请手动选择文本复制');
+  }
+};
+
+copyCancel.onclick = () => dlgExport.close();
+
+renderGrid();
+</script>
+</body>
+</html>

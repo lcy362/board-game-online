@@ -111,6 +111,8 @@
     .racer.active { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); border: 2px solid #ffd93d; }
     .racer.ai { background: #f0f9f8; }
     .racer .car { font-size: 2.2rem; filter: drop-shadow(0 2px 0 rgba(0,0,0,0.1)); }
+    .racer .avatar-wrap { display: flex; align-items: center; justify-content: center; min-height: 3.2rem; }
+    .racer .avatar { width: 3.2rem; height: 3.2rem; object-fit: contain; border-radius: 50%; background: #fff; padding: 2px; box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
     .racer .name { font-weight: 700; font-size: 0.85rem; margin: 4px 0; }
     .tires { display: flex; justify-content: center; gap: 3px; }
     .tire { font-size: 1rem; }
@@ -164,6 +166,7 @@
     .speed-value { font-size: 2.6rem; }
     .hand-card { width: 72px; height: 96px; }
     .racer .car { font-size: 1.8rem; }
+    .racer .avatar { width: 2.6rem; height: 2.6rem; }
   }
 
   /* ===== 规则展示与新手引导（新增） ===== */
@@ -642,53 +645,53 @@ const START_TIRES = 3;
 // 魔法甜心（第五季，甜点主题）＋ 闪耀流星（第六季，星月主题），每局随机不重复抽取
 const AI_ROLES = [
   // —— 奇妙萌可之魔法甜心（甜点系）——
-  { name: '爱心萌可', en: 'Heartsping Mochi', icon: '💗', color: '#ff6b81' },
-  { name: '闪闪萌可', en: 'Sparkle Mochi',  icon: '✨',  color: '#ffd93d' },
-  { name: '软软萌可', en: 'Jelly Mochi',    icon: '🍮',  color: '#e056fd' },
-  { name: '绵绵萌可', en: 'Fluffy Mochi',   icon: '🍥',  color: '#fdcb6e' },
-  { name: '泡泡萌可', en: 'Bubblegum Mochi', icon: '🫧', color: '#fd79a8' },
-  { name: '酸酸萌可', en: 'Sour Mochi',     icon: '🍋',  color: '#a4cb3c' },
-  { name: '甜甜萌可', en: 'Sweet Mochi',    icon: '🍯',  color: '#f39c12' },
-  { name: '糖糖萌可', en: 'Candy Mochi',    icon: '🍭',  color: '#e84393' },
-  { name: '奶油萌可', en: 'Meringue Mochi', icon: '🍰',  color: '#ff9ff3' },
-  { name: '夹心萌可', en: 'Filling Mochi',  icon: '🥐',  color: '#cd6133' },
-  { name: '甜甜圈萌可', en: 'Donut Mochi',  icon: '🍩',  color: '#d63031' },
-  { name: '华夫萌可', en: 'Waffle Mochi',   icon: '🧇',  color: '#b2804a' },
-  { name: '棒棒糖萌可', en: 'Lollipop Mochi', icon: '🍡',  color: '#6c5ce7' },
-  { name: '马卡龙萌可', en: 'Macaron Mochi',  icon: '🧁',  color: '#a29bfe' },
-  { name: '松饼萌可', en: 'Pancake Mochi',  icon: '🥞',  color: '#f8c291' },
-  { name: '蛋糕弟弟萌可', en: 'Muffin Mochi',   icon: '🍪',  color: '#cd5c5c' },
-  { name: '蛋糕妹妹萌可', en: 'Cupcake Mochi',  icon: '🧁',  color: '#ff6b81' },
-  { name: '酸奶萌可', en: 'Yogurt Mochi',   icon: '🥛',  color: '#74b9ff' },
-  { name: '冰沙萌可', en: 'Snow Ice Mochi', icon: '🍧',  color: '#81ecec' },
-  { name: '布丁萌可', en: 'Pudding Mochi',  icon: '🍮',  color: '#f5cd79' },
-  { name: '棉花糖萌可', en: 'Cotton Mochi',   icon: '🍡',  color: '#ffe8d6' },
-  { name: '巧克力萌可', en: 'Choco Mochi',    icon: '🍫',  color: '#6d214f' },
+  { name: '爱心萌可', en: 'Heartsping Mochi', icon: '💗', color: '#ff6b81', img: '爱心萌可.jpg' },
+  { name: '闪闪萌可', en: 'Sparkle Mochi',  icon: '✨',  color: '#ffd93d', img: '闪闪萌可.jpg' },
+  { name: '软软萌可', en: 'Jelly Mochi',    icon: '🍮',  color: '#e056fd', img: '软软萌可.jpg' },
+  { name: '绵绵萌可', en: 'Fluffy Mochi',   icon: '🍥',  color: '#fdcb6e', img: '绵绵萌可.jpg' },
+  { name: '泡泡萌可', en: 'Bubblegum Mochi', icon: '🫧', color: '#fd79a8', img: '泡泡萌可.jpg' },
+  { name: '酸酸萌可', en: 'Sour Mochi',     icon: '🍋',  color: '#a4cb3c', img: '酸酸萌可.jpg' },
+  { name: '甜甜萌可', en: 'Sweet Mochi',    icon: '🍯',  color: '#f39c12', img: '甜甜萌可.jpg' },
+  { name: '糖糖萌可', en: 'Candy Mochi',    icon: '🍭',  color: '#e84393', img: '糖糖萌可.jpg' },
+  { name: '奶油萌可', en: 'Meringue Mochi', icon: '🍰',  color: '#ff9ff3', img: '奶油萌可.jpg' },
+  { name: '夹心萌可', en: 'Filling Mochi',  icon: '🥐',  color: '#cd6133', img: '夹心萌可.jpg' },
+  { name: '甜甜圈萌可', en: 'Donut Mochi',  icon: '🍩',  color: '#d63031', img: '甜甜圈萌可.jpg' },
+  { name: '华夫萌可', en: 'Waffle Mochi',   icon: '🧇',  color: '#b2804a', img: '华夫萌可.jpg' },
+  { name: '棒棒糖萌可', en: 'Lollipop Mochi', icon: '🍡',  color: '#6c5ce7', img: '棒棒糖萌可.jpg' },
+  { name: '马卡龙萌可', en: 'Macaron Mochi',  icon: '🧁',  color: '#a29bfe', img: '马卡龙萌可.jpg' },
+  { name: '松饼萌可', en: 'Pancake Mochi',  icon: '🥞',  color: '#f8c291', img: '松饼萌可.jpg' },
+  { name: '蛋糕弟弟萌可', en: 'Muffin Mochi',   icon: '🍪',  color: '#cd5c5c', img: '蛋糕弟弟萌可.png' },
+  { name: '蛋糕妹妹萌可', en: 'Cupcake Mochi',  icon: '🧁',  color: '#ff6b81', img: '蛋糕妹妹萌可.png' },
+  { name: '酸奶萌可', en: 'Yogurt Mochi',   icon: '🥛',  color: '#74b9ff', img: '酸奶萌可.jpg' },
+  { name: '冰沙萌可', en: 'Snow Ice Mochi', icon: '🍧',  color: '#81ecec', img: '冰沙萌可.jpg' },
+  { name: '布丁萌可', en: 'Pudding Mochi',  icon: '🍮',  color: '#f5cd79', img: '布丁萌可.jpg' },
+  { name: '棉花糖萌可', en: 'Cotton Mochi',   icon: '🍡',  color: '#ffe8d6', img: '棉花糖萌可.jpg' },
+  { name: '巧克力萌可', en: 'Choco Mochi',    icon: '🍫',  color: '#6d214f', img: '巧克力萌可.jpg' },
   // —— 奇妙萌可之闪耀流星（星月系）——
-  { name: '银光萌可', en: 'Silver Mochi',   icon: '🌙',  color: '#b2bec3' },
-  { name: '星光萌可', en: 'Starlight Mochi',icon: '⭐',  color: '#f6e58d' },
-  { name: '月光萌可', en: 'Moonlight Mochi',icon: '🌕',  color: '#dfe6e9' },
-  { name: '兔兔萌可', en: 'Bunny Mochi',    icon: '🐰',  color: '#ff9ff3' },
-  { name: '呼啦萌可', en: 'Hula Mochi',     icon: '🌺',  color: '#ff7675' },
-  { name: '光明萌可', en: 'Light Mochi',    icon: '💡',  color: '#f9ca24' },
-  { name: '叮咚萌可', en: 'Ding Dong Mochi',icon: '🔔',  color: '#f0932b' },
-  { name: '流浪萌可', en: 'Wanderer Mochi', icon: '🎒',  color: '#8d6e63' },
-  { name: '动动萌可', en: 'Active Mochi',   icon: '🏃',  color: '#e74c3c' },
-  { name: '贴贴萌可', en: 'Huggy Mochi',    icon: '🤗',  color: '#fd79a8' },
-  { name: '熊熊萌可', en: 'Bear Mochi',     icon: '🧸',  color: '#b2a187' },
-  { name: '缤缤萌可', en: 'Colorful Mochi',icon: '🎨',  color: '#00b894' },
-  { name: '纷纷萌可', en: 'Snowy Mochi',    icon: '🌨️',  color: '#a4b0be' },
-  { name: '绵羊萌可', en: 'Sheep Mochi',    icon: '🐑',  color: '#ffffff' },
-  { name: '透明萌可', en: 'Invisible Mochi',icon: '👻',  color: '#c8d6e5' },
-  { name: '共共萌可', en: 'Sharing Mochi',  icon: '🤝',  color: '#2ecc71' },
-  { name: '跳舞萌可', en: 'Dancer Mochi',   icon: '💃',  color: '#e84393' },
-  { name: '狐狐萌可', en: 'Fox Mochi',      icon: '🦊',  color: '#e17055' },
-  { name: '歌谣萌可', en: 'Ballad Mochi',   icon: '🎵',  color: '#9b59b6' },
-  { name: '乐美萌可', en: 'Yue Mei Mochi',  icon: '💖',  color: '#ff6b81' },
-  { name: '悄悄萌可', en: 'Quiet Mochi',    icon: '🤫',  color: '#576574' },
-  { name: '亲亲萌可', en: 'Kissy Mochi',    icon: '😘',  color: '#fab1a0' },
-  { name: '王子萌可', en: 'Prince Mochi',   icon: '🤴',  color: '#6c5ce7' },
-  { name: '极光萌可', en: 'Aurora Mochi',   icon: '🌈',  color: '#00cec9' },
+  { name: '银光萌可', en: 'Silver Mochi',   icon: '🌙',  color: '#b2bec3', img: '银光萌可.png' },
+  { name: '星光萌可', en: 'Starlight Mochi',icon: '⭐',  color: '#f6e58d', img: '星光萌可.png' },
+  { name: '月光萌可', en: 'Moonlight Mochi',icon: '🌕',  color: '#dfe6e9', img: '月光萌可.png' },
+  { name: '兔兔萌可', en: 'Bunny Mochi',    icon: '🐰',  color: '#ff9ff3', img: '兔兔萌可.png' },
+  { name: '呼啦萌可', en: 'Hula Mochi',     icon: '🌺',  color: '#ff7675', img: '呼啦萌可.png' },
+  { name: '光明萌可', en: 'Light Mochi',    icon: '💡',  color: '#f9ca24', img: '光明萌可.png' },
+  { name: '叮咚萌可', en: 'Ding Dong Mochi',icon: '🔔',  color: '#f0932b', img: '叮咚萌可.png' },
+  { name: '流浪萌可', en: 'Wanderer Mochi', icon: '🎒',  color: '#8d6e63', img: '流浪萌可.png' },
+  { name: '动动萌可', en: 'Active Mochi',   icon: '🏃',  color: '#e74c3c', img: '动动萌可.png' },
+  { name: '贴贴萌可', en: 'Huggy Mochi',    icon: '🤗',  color: '#fd79a8', img: '贴贴萌可.png' },
+  { name: '熊熊萌可', en: 'Bear Mochi',     icon: '🧸',  color: '#b2a187', img: '熊熊萌可.png' },
+  { name: '缤缤萌可', en: 'Colorful Mochi',icon: '🎨',  color: '#00b894', img: '缤缤萌可.png' },
+  { name: '纷纷萌可', en: 'Snowy Mochi',    icon: '🌨️',  color: '#a4b0be', img: '纷纷萌可.png' },
+  { name: '绵羊萌可', en: 'Sheep Mochi',    icon: '🐑',  color: '#ffffff', img: '绵羊萌可.png' },
+  { name: '透明萌可', en: 'Invisible Mochi',icon: '👻',  color: '#c8d6e5', img: '透明萌可.png' },
+  { name: '共共萌可', en: 'Sharing Mochi',  icon: '🤝',  color: '#2ecc71', img: '共共萌可.png' },
+  { name: '跳舞萌可', en: 'Dancer Mochi',   icon: '💃',  color: '#e84393', img: '跳舞萌可.png' },
+  { name: '狐狐萌可', en: 'Fox Mochi',      icon: '🦊',  color: '#e17055', img: '狐狐萌可.png' },
+  { name: '歌谣萌可', en: 'Ballad Mochi',   icon: '🎵',  color: '#9b59b6', img: '歌谣萌可.png' },
+  { name: '乐美萌可', en: 'Yue Mei Mochi',  icon: '💖',  color: '#ff6b81', img: '乐美萌可.jpg' },
+  { name: '悄悄萌可', en: 'Quiet Mochi',    icon: '🤫',  color: '#576574', img: '悄悄萌可.png' },
+  { name: '亲亲萌可', en: 'Kissy Mochi',    icon: '😘',  color: '#fab1a0', img: '亲亲萌可.png' },
+  { name: '王子萌可', en: 'Prince Mochi',   icon: '🤴',  color: '#6c5ce7', img: '王子萌可.png' },
+  { name: '极光萌可', en: 'Aurora Mochi',   icon: '🌈',  color: '#00cec9', img: '极光萌可.png' },
 ];
 
 // 功能牌定义——严格按实物规则书
@@ -746,7 +749,7 @@ function initGame(aiCount, aiLevel) {
   for (let i = 1; i <= aiCount; i++) {
     const role = roles[(i - 1) % roles.length];
     players.push({
-      id: i, isPlayer: false, name: role.name, enName: role.en, car: role.icon, color: role.color,
+      id: i, isPlayer: false, name: role.name, enName: role.en, car: role.icon, img: role.img, color: role.color,
       tires: START_TIRES, hand: [], alive: true, level: aiLevel
     });
   }
@@ -1163,8 +1166,11 @@ function renderRacers() {
     const div = document.createElement('div');
     div.className = 'racer' + (p.isPlayer ? '' : ' ai') + (i === state.currentIdx ? ' active' : '');
     div.style.opacity = p.alive ? 1 : 0.45;
+    const avatar = p.img
+      ? `<img class="avatar" src="/assets/mochi/${p.img}" alt="${playerName(p)}" loading="lazy" draggable="false" onerror="this.replaceWith(Object.assign(document.createElement('span'), {className:'car', textContent:'${p.car}'}))">`
+      : `<div class="car">${p.car}</div>`;
     div.innerHTML = `
-      <div class="car" style="${p.alive ? '' : 'filter:grayscale(100%)'}">${p.car}</div>
+      <div class="avatar-wrap" style="${p.alive ? '' : 'filter:grayscale(100%) opacity(0.5)'}">${avatar}</div>
       <div class="name">${playerName(p)}</div>
       <div class="tires">${Array.from({length: START_TIRES}).map((_, ti) => `<span class="tire ${ti < p.tires ? '' : 'lost'}">🛞</span>`).join('')}</div>
     `;

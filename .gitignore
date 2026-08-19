@@ -3,3 +3,8 @@ node_modules/
 *.zip
 .workbuddy/
 scripts/__pycache__/
+
+# APK 构建产物与签名密钥（不提交）
+apk-build/build/
+apk-build/output/
+apk-build/speed101.keystore

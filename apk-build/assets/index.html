@@ -1118,7 +1118,7 @@ function renderRacers() {
     div.className = 'racer' + (p.isPlayer ? '' : ' ai') + (i === state.currentIdx ? ' active' : '');
     div.style.opacity = p.alive ? 1 : 0.45;
     const avatar = p.img
-      ? `<img class="avatar" src="assets/mochi/${p.img}" alt="${playerName(p)}" loading="lazy" draggable="false" onerror="this.replaceWith(Object.assign(document.createElement('span'), {className:'car', textContent:'${p.car}'}))">`
+      ? `<img class="avatar" src="mochi/${p.img}" alt="${playerName(p)}" loading="lazy" draggable="false" onerror="this.replaceWith(Object.assign(document.createElement('span'), {className:'car', textContent:'${p.car}'}))">`
       : `<div class="car">${p.car}</div>`;
     div.innerHTML = `
       <div class="avatar-wrap" style="${p.alive ? '' : 'filter:grayscale(100%) opacity(0.5)'}">${avatar}</div>

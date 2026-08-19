@@ -47,7 +47,6 @@ echo "==> 2/7 链接资源并生成 R.java + base.apk (aapt2 link)"
   --target-sdk-version 35 \
   --version-code 1 \
   --version-name "$APP_VERSION" \
-  -A "$ASSETS" \
   $(find "$BUILD/compiled" -name "*.flat")
 
 echo "==> 3/7 编译 Java 源码 (javac)"
@@ -61,10 +60,24 @@ echo "==> 4/7 转 dex (d8)"
   --output "$BUILD" \
   $(find "$BUILD/classes" -name "*.class")
 
-echo "==> 5/7 组装未签名 APK（加入 classes.dex）"
+echo "==> 5/7 组装未签名 APK（加入 classes.dex + assets，UTF-8 中文文件名）"
 cp "$BUILD/base.apk" "$BUILD/unsigned.apk"
 cd "$BUILD" && zip -q -X unsigned.apk classes.dex
 cd "$ROOT"
+# 用 Python zipfile 追加 assets（系统 zip / aapt2 都会损坏 UTF-8 中文文件名）
+python3 - "$BUILD" "$ASSETS" <<'PYEOF'
+import sys, zipfile, os
+build, assets = sys.argv[1], sys.argv[2]
+apk = os.path.join(build, 'unsigned.apk')
+with zipfile.ZipFile(apk, 'a', zipfile.ZIP_DEFLATED) as z:
+    for root, dirs, files in os.walk(assets):
+        for f in files:
+            src = os.path.join(root, f)
+            rel = os.path.relpath(src, assets)
+            arc = os.path.join('assets', rel)
+            z.write(src, arc)
+print("    -- assets 已追加（UTF-8 编码）")
+PYEOF
 
 echo "==> 6/7 zipalign 对齐"
 "$ZIPALIGN" -f 4 "$BUILD/unsigned.apk" "$OUT/unsigned-aligned.apk"
